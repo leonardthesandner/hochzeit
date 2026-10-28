@@ -709,11 +709,8 @@
           <p>Bitte gebt uns bis zum 1. Juni 2027 Bescheid. Ihr könnt alle Personen eurer Einladung in einer Antwort eintragen.</p>
         </div>
 
-        <form id="rsvp" name="zusage" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
-          <input type="hidden" name="form-name" value="zusage">
-          <input type="hidden" name="gaeste" value="">
-          <input type="hidden" name="anzahl_personen" value="">
-          <p class="hp"><label>Nicht ausfüllen <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <form id="rsvp" name="zusage" novalidate>
+          <p class="hp"><label>Nicht ausfüllen <input name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
 
           <fieldset>
             <legend>Seid ihr dabei?</legend>
@@ -808,6 +805,9 @@
 
   <script>
     (function () {
+      // Formspree-Formular, an das die Antworten geschickt werden
+      const FORMSPREE_URL = 'https://formspree.io/f/mzeegqlr';
+
       const form = document.getElementById('rsvp');
       const list = document.getElementById('guests');
       const tpl = document.getElementById('guest-tpl');
@@ -866,12 +866,6 @@
       });
       addBtn.addEventListener('click', () => addGuest(true));
 
-      function encode(data) {
-        return Object.keys(data)
-          .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
-          .join('&');
-      }
-
       function showError(msg, field) {
         errorEl.textContent = msg;
         errorEl.hidden = false;
@@ -905,8 +899,8 @@
         }
 
         const data = {
-          'form-name': 'zusage',
-          'bot-field': form.querySelector('input[name="bot-field"]').value,
+          _subject: (yes ? 'Zusage' : 'Absage') + ' von ' + guests[0].split(':')[0],
+          _gotcha: form._gotcha.value,
           teilnahme: yes ? 'Ja' : 'Nein',
           anzahl_personen: String(guests.length),
           gaeste: guests.join('\n'),
@@ -917,10 +911,10 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'Wird gesendet …';
         try {
-          const res = await fetch('/', {
+          const res = await fetch(FORMSPREE_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: encode(data)
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(data)
           });
           if (!res.ok) throw new Error(res.status);
 
