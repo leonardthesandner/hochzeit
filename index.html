@@ -7,7 +7,7 @@
   <meta name="description" content="Elli und Leo heiraten am 14. August 2027 auf Schloss Egg. Hier findet ihr alles zum Tag und könnt zusagen.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap" rel="stylesheet">
   <style>
     :root {
       /* Farben aus der Save-the-Date-Karte */
@@ -22,16 +22,17 @@
       --error: #9a3b2c;
 
       --serif: "EB Garamond", "Garamond", "Georgia", serif;
-      --script: "Mrs Saint Delafield", "Snell Roundhand", cursive;
+      --script: "Pinyon Script", "Snell Roundhand", cursive;
 
       --measure: 36rem;
       --gutter: clamp(1rem, 5vw, 3rem);
       --frame: clamp(0.5rem, 1.6vw, 1.25rem);
+      --nav-h: 2.75rem;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
 
     body {
       margin: 0;
@@ -119,8 +120,9 @@
 
     /* ---------- Startbereich ---------- */
     .hero {
-      --branch-w: min(15rem, 34vw);
-      min-height: 100svh;
+      --branch-w: min(15rem, 34vw, 20svh);
+      margin-top: var(--nav-h);
+      min-height: calc(100svh - var(--nav-h));
       display: grid;
       grid-template-columns: 1fr;
       overflow: hidden;
@@ -140,20 +142,20 @@
     .hero > .branch { width: var(--branch-w); }
 
     .nav {
-      position: absolute;
-      top: calc(var(--frame) + 1.25rem);
-      right: calc(var(--frame) + 1.5rem);
-      z-index: 4;
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 10;
+      height: var(--nav-h);
       display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 0 1.5rem;
-      max-width: 48%;
+      justify-content: center;
+      align-items: center;
+      gap: 0 2rem;
       padding: 0 1rem;
       font-size: 0.875rem;
-      background: rgba(242, 226, 210, 0.82);
-      -webkit-backdrop-filter: blur(4px);
-      backdrop-filter: blur(4px);
+      background: rgba(242, 226, 210, 0.92);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
     }
     .nav a {
       text-decoration: none;
@@ -162,6 +164,7 @@
       min-height: 44px;
       display: inline-flex;
       align-items: center;
+      white-space: nowrap;
     }
     .nav a:hover { text-decoration: underline; }
 
@@ -189,7 +192,7 @@
     .names {
       font-family: var(--script);
       font-weight: 400;
-      font-size: clamp(3.5rem, min(26vw, 12.5svh), 10rem);
+      font-size: clamp(3.5rem, min(26vw, 13svh), 10rem);
       line-height: 0.92;
       margin: 0;
       color: var(--ink);
@@ -243,7 +246,6 @@
         mask-image: linear-gradient(to right, transparent 0, #000 28%), linear-gradient(to bottom, #000 92%, transparent 100%);
         mask-composite: intersect;
       }
-      .nav { max-width: 45%; }
     }
 
     .btn {
@@ -306,7 +308,7 @@
     }
     .photo figcaption {
       font-family: var(--script);
-      font-size: 2.5rem;
+      font-size: 2rem;
       text-align: center;
       padding-top: 0.375rem;
       color: var(--ink-soft);
@@ -444,7 +446,7 @@
     }
     .choices .or {
       font-family: var(--script);
-      font-size: 2.25rem;
+      font-size: 1.75rem;
       line-height: 1;
       color: var(--olive);
     }
@@ -533,7 +535,7 @@
     }
     .guest-title {
       font-family: var(--script);
-      font-size: 2.5rem;
+      font-size: 2rem;
       line-height: 1;
       margin: 0;
     }
@@ -601,7 +603,7 @@
       outline-offset: -7px;
       background: var(--paper-light);
     }
-    .thanks h3 { font-family: var(--script); font-weight: 400; font-size: 3.5rem; line-height: 1.1; }
+    .thanks h3 { font-family: var(--script); font-weight: 400; font-size: 2.75rem; line-height: 1.1; }
 
     .hp { position: absolute; left: -9999px; }
 
@@ -613,31 +615,34 @@
     }
     footer .sig {
       font-family: var(--script);
-      font-size: 4.5rem;
+      font-size: 3.25rem;
       line-height: 1;
       margin: 0;
     }
     footer .kicker { font-size: 0.875rem; color: var(--ink-soft); }
 
     @media (max-width: 59.99rem) {
-      .nav {
-        position: static;
-        max-width: none;
-        justify-content: center;
-        background: none;
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-        padding: 0 1.5rem 1rem;
-        order: 1;
-      }
       .hero-text { padding-top: calc(var(--frame) + var(--branch-w) * 0.48 + 0.75rem); }
-      .hero-art { order: 2; }
+      .hero-art {
+        order: 2;
+        height: 80svh;
+        overflow: hidden;
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20%, #000 85%, transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0, #000 20%, #000 85%, transparent 100%);
+      }
+      .hero-art img {
+        height: 125%;
+        max-height: none;
+        -webkit-mask-image: none;
+        mask-image: none;
+      }
     }
 
     @media (max-width: 34rem) {
       .timeline li { grid-template-columns: 1fr; gap: 0.125rem; }
       .attend { grid-template-columns: 1fr; }
-      .nav { gap: 0 1rem; font-size: 0.8125rem; }
+      .nav { gap: 0 0.875rem; font-size: 0.75rem; }
+      .nav a { letter-spacing: 0.1em; }
     }
   </style>
 </head>
@@ -654,15 +659,15 @@
     </symbol>
   </svg>
 
+  <nav class="nav" aria-label="Seitennavigation">
+    <a href="#ablauf">Der Tag</a>
+    <a href="#anreise">Anreise</a>
+    <a href="#menue">Menü</a>
+    <a href="#zusage">Zusage</a>
+  </nav>
+
   <header class="hero framed">
     <img class="branch" src="bilder/zweig.jpg" alt="" width="444" height="212">
-
-    <nav class="nav" aria-label="Seitennavigation">
-      <a href="#ablauf">Der Tag</a>
-      <a href="#anreise">Anreise</a>
-      <a href="#menue">Menü</a>
-      <a href="#zusage">Zusage</a>
-    </nav>
 
     <div class="hero-text">
       <p class="kicker big">Wir heiraten</p>
@@ -1105,7 +1110,7 @@
 
       addGuest(false);
 
-      // Schloss im Startbereich bewegt sich am großen Bildschirm langsamer als die Seite
+      // Schloss im Startbereich bewegt sich langsamer als die Seite
       const art = document.querySelector('.hero-art img');
       if (art && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const wide = matchMedia('(min-width: 60rem)');
@@ -1116,13 +1121,18 @@
           requestAnimationFrame(() => {
             const y = scrollY;
             if (!wide.matches) {
-              art.style.transform = '';
+              // Am Handy wandert das Bild in seinem Ausschnitt langsam nach unten
+              const box = art.parentElement.getBoundingClientRect();
+              const p = Math.min(1, Math.max(0, (innerHeight - box.top) / (innerHeight + box.height)));
+              const extra = art.offsetHeight - box.height;
+              art.style.transform = 'translateY(' + (-extra * (1 - p)).toFixed(1) + 'px)';
             } else if (y < innerHeight * 2) {
               art.style.transform = 'translateY(' + (y * 0.35).toFixed(1) + 'px)';
             }
             ticking = false;
           });
         }, { passive: true });
+        dispatchEvent(new Event('scroll'));
       }
     })();
   </script>
