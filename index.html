@@ -219,33 +219,40 @@
       margin: 0.25rem 0 1.8svh;
     }
 
-    .hero-art { position: relative; }
+    /* Das Schloss liegt hinter dem Text und füllt den Großteil des Startbereichs */
+    .hero-art {
+      position: absolute;
+      z-index: 0;
+      inset: 24% 0 0 0;
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 92%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 92%, transparent 100%);
+    }
     .hero-art img {
-      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: auto;
-      max-height: 85svh;
+      height: 125%;
       object-fit: cover;
-      object-position: 50% 45%;
+      object-position: 50% 40%;
       will-change: transform;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 88%, transparent 100%);
-      mask-image: linear-gradient(to bottom, transparent 0, #000 22%, #000 88%, transparent 100%);
+    }
+    .hero-text {
+      text-shadow: 0 0 6px rgba(242, 226, 210, 0.95), 0 0 18px rgba(242, 226, 210, 0.85);
     }
 
     @media (min-width: 60rem) {
       .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); --branch-w: min(17rem, 24vw, 30svh); }
-      .hero-text { padding: 2rem var(--gutter); }
-      .hero-art img {
-        position: absolute;
-        inset: 0;
-        height: 100%;
-        max-height: none;
-        object-position: 50% 50%;
-        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 28%), linear-gradient(to bottom, #000 92%, transparent 100%);
+      .hero-text { padding: 2rem var(--gutter); grid-column: 1; }
+      .hero-art {
+        inset: 0 0 0 25%;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 35%), linear-gradient(to bottom, #000 92%, transparent 100%);
         -webkit-mask-composite: source-in;
-        mask-image: linear-gradient(to right, transparent 0, #000 28%), linear-gradient(to bottom, #000 92%, transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0, #000 35%), linear-gradient(to bottom, #000 92%, transparent 100%);
         mask-composite: intersect;
       }
+      .hero-art img { object-position: 50% 50%; }
     }
 
     .btn {
@@ -622,20 +629,25 @@
     footer .kicker { font-size: 0.875rem; color: var(--ink-soft); }
 
     @media (max-width: 59.99rem) {
-      .hero-text { padding-top: calc(var(--frame) + var(--branch-w) * 0.48 + 0.75rem); }
-      .hero-art {
-        order: 2;
-        height: 80svh;
-        overflow: hidden;
-        -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20%, #000 85%, transparent 100%);
-        mask-image: linear-gradient(to bottom, transparent 0, #000 20%, #000 85%, transparent 100%);
+      .hero-text {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        padding-top: calc(var(--frame) + var(--branch-w) * 0.48 + 0.5rem);
       }
-      .hero-art img {
-        height: 125%;
-        max-height: none;
-        -webkit-mask-image: none;
-        mask-image: none;
+      .hero-text .heart, .hero-text .orn-2 { display: none; }
+      .names { font-size: clamp(3rem, 15vw, 4.75rem); line-height: 1.1; }
+      .names span { display: inline; }
+      .names .amp { margin: 0 0.2em; }
+      .date br { display: none; }
+      .date { font-size: clamp(1.375rem, 6.6vw, 2.25rem); }
+      .hero-art::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(242, 226, 210, 0.8) 0%, rgba(242, 226, 210, 0.4) 22%, rgba(242, 226, 210, 0) 42%);
       }
+      .hero-text .btn { margin: auto auto 1.75rem; }
     }
 
     @media (max-width: 34rem) {
@@ -679,8 +691,8 @@
       </h1>
       <svg class="heart" aria-hidden="true"><use href="#heart"/></svg>
       <p class="kicker">am</p>
-      <p class="date"><time datetime="2027-08-14">14. August<br>2027</time></p>
-      <svg class="orn" aria-hidden="true"><use href="#orn"/></svg>
+      <p class="date"><time datetime="2027-08-14">14. August <br>2027</time></p>
+      <svg class="orn orn-2" aria-hidden="true"><use href="#orn"/></svg>
       <p class="kicker">auf</p>
       <p class="place">Schloss Egg</p>
       <a class="btn" href="#zusage">Jetzt zusagen</a>
@@ -1113,21 +1125,17 @@
       // Schloss im Startbereich bewegt sich langsamer als die Seite
       const art = document.querySelector('.hero-art img');
       if (art && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const wide = matchMedia('(min-width: 60rem)');
         let ticking = false;
         addEventListener('scroll', () => {
           if (ticking) return;
           ticking = true;
           requestAnimationFrame(() => {
-            const y = scrollY;
-            if (!wide.matches) {
-              // Am Handy wandert das Bild in seinem Ausschnitt langsam nach unten
-              const box = art.parentElement.getBoundingClientRect();
+            // Das Bild wandert in seinem Ausschnitt langsam nach unten
+            const box = art.parentElement.getBoundingClientRect();
+            if (box.bottom > 0) {
               const p = Math.min(1, Math.max(0, (innerHeight - box.top) / (innerHeight + box.height)));
               const extra = art.offsetHeight - box.height;
               art.style.transform = 'translateY(' + (-extra * (1 - p)).toFixed(1) + 'px)';
-            } else if (y < innerHeight * 2) {
-              art.style.transform = 'translateY(' + (y * 0.35).toFixed(1) + 'px)';
             }
             ticking = false;
           });
