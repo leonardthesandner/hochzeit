@@ -1,0 +1,8 @@
+# Originalfoto (zu groß, die Website nutzt die Kopien in bilder/)
+IMG_*.JPG
+IMG_*.jpg
+
+# Lokale Werkzeuge
+.agents/
+.claude/
+skills-lock.json

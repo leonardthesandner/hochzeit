@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elli &amp; Leo – 14. August 2027</title>
+  <meta name="description" content="Elli und Leo heiraten am 14. August 2027 auf Schloss Egg bei Deggendorf. Hier findet ihr alles zum Tag und könnt zusagen.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green-950: #142a1f;
+      --green-900: #1e3b2c;
+      --green-700: #335a45;
+      --beige-100: #f3ecdf;
+      --beige-200: #e8dcc4;
+      --beige-400: #c9b48e;
+      --brass: #8c7350;
+      --ink: #1a2a21;
+      --ink-soft: #4a5a4f;
+      --error: #a3362a;
+
+      --serif: "Bodoni Moda", "Didot", "Georgia", serif;
+      --sans: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+
+      --measure: 38rem;
+      --gutter: clamp(1rem, 5vw, 3rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--beige-100);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-underline-offset: 0.2em; }
+
+    :focus-visible {
+      outline: 2px solid var(--brass);
+      outline-offset: 3px;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(2.25rem, 6vw, 3.5rem);
+      line-height: 1.05;
+      margin: 0 0 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 1.375rem;
+      line-height: 1.25;
+      margin: 0 0 0.5rem;
+    }
+
+    p { margin: 0 0 1rem; }
+
+    .wrap {
+      max-width: 60rem;
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+
+    section { padding: clamp(4rem, 10vw, 7rem) 0; }
+
+    /* ---------- Navigation ---------- */
+    .nav {
+      position: absolute;
+      inset: 0 0 auto 0;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.75rem;
+      padding: 1.25rem var(--gutter);
+      font-size: 0.9375rem;
+    }
+    .nav a {
+      color: var(--beige-200);
+      text-decoration: none;
+      padding: 0.5rem 0.25rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav a:hover { color: #fff; text-decoration: underline; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      background: var(--green-900);
+      color: var(--beige-200);
+      display: grid;
+    }
+    .hero-text {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 6rem var(--gutter) 3rem;
+      overflow: hidden;
+    }
+
+    .hero-photo { margin: 0; position: relative; }
+    .hero-photo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      object-position: 50% 62%;
+    }
+
+    @media (min-width: 60rem) {
+      .hero { grid-template-columns: 1fr 1fr; }
+      .hero-text .names { font-size: clamp(5rem, 9vw, 9.5rem); }
+      .hero-photo img {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        aspect-ratio: auto;
+      }
+    }
+
+    .names {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-style: italic;
+      font-size: clamp(4.5rem, 19vw, 11rem);
+      line-height: 0.85;
+      margin: 0;
+      letter-spacing: -0.02em;
+      color: var(--beige-100);
+    }
+    .names span { display: block; }
+    .names .amp {
+      font-style: normal;
+      font-size: 0.42em;
+      line-height: 1.3;
+      color: var(--beige-400);
+    }
+
+    .castle {
+      display: block;
+      width: min(26rem, 88vw);
+      height: auto;
+      margin: 2.25rem auto 1.75rem;
+      color: var(--beige-400);
+    }
+    .castle path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+
+    .hero-date {
+      font-family: var(--serif);
+      font-size: clamp(1.375rem, 4vw, 1.875rem);
+      margin: 0 0 0.25rem;
+      color: var(--beige-100);
+    }
+    .hero-place { margin: 0 0 2.25rem; color: var(--beige-200); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0.75rem 1.75rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font: 600 1rem/1 var(--sans);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .btn-light { background: var(--beige-200); color: var(--green-950); }
+    .btn-light:hover { background: var(--beige-100); }
+    .btn-dark { background: var(--green-900); color: var(--beige-100); }
+    .btn-dark:hover { background: var(--green-700); }
+    .btn-dark[disabled] { opacity: 0.6; cursor: progress; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .castle path {
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        animation: draw 2.4s cubic-bezier(.45,.05,.3,1) 0.2s forwards;
+      }
+      .castle .late { animation-delay: 1.4s; animation-duration: 1.4s; }
+      @keyframes draw { to { stroke-dashoffset: 0; } }
+    }
+
+    /* ---------- Ablauf ---------- */
+    .intro {
+      max-width: var(--measure);
+      font-family: var(--serif);
+      font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+      line-height: 1.5;
+      margin-bottom: 3.5rem;
+    }
+
+    .timeline {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-width: 44rem;
+    }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 6.5rem 1fr;
+      gap: 1rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--beige-400);
+    }
+    .timeline li:last-child { border-bottom: 1px solid var(--beige-400); }
+    .timeline time {
+      font-family: var(--serif);
+      font-size: 1.625rem;
+      line-height: 1.1;
+      color: var(--green-700);
+    }
+    .timeline p { margin: 0; color: var(--ink-soft); }
+
+    /* ---------- Anreise ---------- */
+    .travel {
+      background: var(--beige-200);
+    }
+    .travel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      gap: 2.5rem 3rem;
+    }
+    .travel address { font-style: normal; margin-bottom: 1rem; }
+    .travel p { color: var(--ink-soft); max-width: var(--measure); }
+    .shuttle {
+      margin-top: 3.5rem;
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      background: var(--green-900);
+      color: var(--beige-200);
+      border-radius: 1rem;
+    }
+    .shuttle h3 { color: var(--beige-100); font-size: 1.75rem; }
+    .shuttle p { color: var(--beige-200); }
+    .rides {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      gap: 1.5rem 3rem;
+      margin: 1.75rem 0 0;
+    }
+    .rides div { border-top: 1px solid var(--green-700); padding-top: 1rem; }
+    .rides dt {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--beige-400);
+      margin-bottom: 0.25rem;
+    }
+    .rides dd { margin: 0; }
+    .rides strong {
+      display: block;
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 2rem;
+      line-height: 1.2;
+      color: var(--beige-100);
+    }
+
+    .stay { margin-top: 3.5rem; }
+    .hotels {
+      list-style: none;
+      margin: 1.5rem 0 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      gap: 0 3rem;
+    }
+    .hotels li {
+      border-top: 1px solid var(--beige-400);
+      padding: 1rem 0 0.5rem;
+    }
+    .hotels strong { display: block; font-weight: 600; }
+    .hotels span { display: block; color: var(--ink-soft); }
+
+    .text-link {
+      font-weight: 600;
+      color: var(--green-900);
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+    }
+
+    /* ---------- Menü ---------- */
+    .menu {
+      background: var(--green-900);
+      color: var(--beige-200);
+      text-align: center;
+    }
+    .menu h2 { color: var(--beige-100); }
+    .menu-lead { max-width: 30rem; margin: 0 auto 3.5rem; }
+    .course {
+      max-width: 32rem;
+      margin: 0 auto;
+      padding: 2rem 0;
+    }
+    .course + .course { border-top: 1px solid var(--green-700); }
+    .course-name {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.125rem;
+      color: var(--beige-400);
+      margin-bottom: 0.75rem;
+    }
+    .course h3 { color: var(--beige-100); }
+    .course p { margin: 0; }
+    .choices {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 1.5rem;
+    }
+    .choices .or {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--beige-400);
+      font-size: 1rem;
+    }
+
+    /* ---------- Zusage ---------- */
+    .rsvp-head { max-width: var(--measure); margin-bottom: 2.5rem; }
+    .rsvp-head p { color: var(--ink-soft); }
+
+    form { max-width: 40rem; }
+
+    fieldset {
+      border: 0;
+      margin: 0 0 2rem;
+      padding: 0;
+      min-width: 0;
+    }
+    legend, .label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.625rem;
+      padding: 0;
+    }
+    .hint { font-weight: 400; color: var(--ink-soft); }
+
+    .attend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .pill {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-height: 56px;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--beige-400);
+      border-radius: 0.75rem;
+      background: #fbf8f2;
+      cursor: pointer;
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+    .pill:hover { border-color: var(--green-700); }
+    .pill input {
+      appearance: none;
+      flex: none;
+      width: 1.25rem;
+      height: 1.25rem;
+      margin: 0;
+      border: 1.5px solid var(--green-700);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+    }
+    .pill input::before {
+      content: "";
+      width: 0.625rem;
+      height: 0.625rem;
+      border-radius: 50%;
+      background: var(--green-900);
+      transform: scale(0);
+      transition: transform 0.15s;
+    }
+    .pill input:checked::before { transform: scale(1); }
+    .pill:has(input:checked) {
+      border-color: var(--green-900);
+      background: var(--beige-200);
+      box-shadow: inset 0 0 0 1px var(--green-900);
+    }
+    .pill:has(input:focus-visible) { outline: 2px solid var(--brass); outline-offset: 2px; }
+    .pill input:focus-visible { outline: none; }
+    .pill-text strong { display: block; font-weight: 600; }
+    .pill-text small { display: block; color: var(--ink-soft); font-size: 0.875rem; line-height: 1.4; }
+
+    .guest {
+      border-top: 1px solid var(--beige-400);
+      padding-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .guest-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .guest-title {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      margin: 0;
+    }
+    .remove {
+      background: none;
+      border: 0;
+      padding: 0.5rem 0;
+      min-height: 44px;
+      color: var(--ink-soft);
+      font: inherit;
+      font-size: 0.9375rem;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      cursor: pointer;
+    }
+    .remove:hover { color: var(--error); }
+
+    .field { margin-bottom: 1.25rem; }
+    input[type="text"], textarea {
+      width: 100%;
+      font: inherit;
+      color: var(--ink);
+      background: #fbf8f2;
+      border: 1px solid var(--beige-400);
+      border-radius: 0.5rem;
+      padding: 0.75rem 0.875rem;
+      min-height: 48px;
+    }
+    input[type="text"]:focus, textarea:focus {
+      outline: 2px solid var(--brass);
+      outline-offset: 1px;
+      border-color: var(--green-700);
+    }
+    textarea { resize: vertical; min-height: 6rem; }
+
+    .mains { display: grid; gap: 0.625rem; }
+    .mains[hidden] { display: none; }
+
+    .add {
+      background: none;
+      border: 1px dashed var(--green-700);
+      border-radius: 0.75rem;
+      color: var(--green-900);
+      font: 600 1rem var(--sans);
+      width: 100%;
+      min-height: 52px;
+      cursor: pointer;
+      margin-bottom: 2rem;
+    }
+    .add:hover { background: var(--beige-200); }
+
+    .form-error {
+      color: var(--error);
+      font-weight: 500;
+      margin: 0 0 1rem;
+    }
+
+    .thanks {
+      max-width: var(--measure);
+      border-left: 3px solid var(--green-900);
+      padding: 0.5rem 0 0.5rem 1.5rem;
+    }
+    .thanks h3 { font-size: 1.75rem; }
+
+    .hp { position: absolute; left: -9999px; }
+
+    /* ---------- Footer ---------- */
+    footer {
+      background: var(--green-950);
+      color: var(--beige-400);
+      text-align: center;
+      padding: 3rem var(--gutter);
+      font-size: 0.9375rem;
+    }
+    footer .sig {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.75rem;
+      color: var(--beige-200);
+      margin-bottom: 0.25rem;
+    }
+
+    @media (max-width: 34rem) {
+      .timeline li { grid-template-columns: 1fr; gap: 0.25rem; }
+      .attend { grid-template-columns: 1fr; }
+      .nav { gap: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="hero-text">
+    <nav class="nav" aria-label="Seitennavigation">
+      <a href="#ablauf">Ablauf</a>
+      <a href="#anreise">Anreise</a>
+      <a href="#menue">Menü</a>
+      <a href="#zusage">Zusage</a>
+    </nav>
+
+    <div>
+      <h1 class="names">
+        <span>Elli</span>
+        <span class="amp">&amp;</span>
+        <span>Leo</span>
+      </h1>
+
+      <svg class="castle" viewBox="0 -12 400 172" role="img" aria-label="Zeichnung von Schloss Egg">
+        <path pathLength="1" d="M20 150 H380" />
+        <path pathLength="1" d="M100 150 V32 h8 v8 h8 v-8 h8 v8 h8 v-8 h8 V150" />
+        <path pathLength="1" d="M260 150 V14 h8 v8 h8 v-8 h8 v8 h8 v-8 h8 V150" />
+        <path pathLength="1" d="M140 70 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10 v-7 h10 v7 h10" />
+        <path class="late" pathLength="1" d="M188 150 V128 Q200 112 212 128 V150" />
+        <path class="late" pathLength="1" d="M156 110 V96 Q162 86 168 96 V110 Z" />
+        <path class="late" pathLength="1" d="M232 110 V96 Q238 86 244 96 V110 Z" />
+        <path class="late" pathLength="1" d="M116 100 V84 Q120 78 124 84 V100 Z" />
+        <path class="late" pathLength="1" d="M276 90 V72 Q280 66 284 72 V90 Z" />
+        <path class="late" pathLength="1" d="M276 125 V112 Q280 106 284 112 V125 Z" />
+        <path class="late" pathLength="1" d="M280 14 V-6 l13 4 l-13 4" />
+        <path class="late" pathLength="1" d="M60 150 V136 M48 136 Q60 96 72 136 Z" />
+        <path class="late" pathLength="1" d="M336 150 V138 M326 138 Q336 106 346 138 Z" />
+      </svg>
+
+      <p class="hero-date"><time datetime="2027-08-14">14. August 2027</time></p>
+      <p class="hero-place">Schloss Egg bei Deggendorf</p>
+      <a class="btn btn-light" href="#zusage">Jetzt zusagen</a>
+    </div>
+    </div>
+
+    <figure class="hero-photo">
+      <img src="bilder/elli-leo-1600.jpg"
+           srcset="bilder/elli-leo-800.jpg 800w, bilder/elli-leo-1600.jpg 1600w"
+           sizes="(min-width: 60rem) 50vw, 100vw"
+           width="1600" height="2400"
+           alt="Elli und Leo gehen Hand in Hand durch eine Sommerwiese">
+    </figure>
+  </header>
+
+  <main>
+    <section id="ablauf">
+      <div class="wrap">
+        <h2>Der Tag</h2>
+        <p class="intro">Wir freuen uns sehr, diesen Tag mit euch zu feiern – zwischen alten Mauern, im Grünen und hoffentlich bis tief in die Nacht.</p>
+
+        <ol class="timeline">
+          <li>
+            <time datetime="14:00">14:00</time>
+            <div>
+              <h3>Trauung</h3>
+              <p>Im Schlosshof, bei Regen in der Schlosskapelle.</p>
+            </div>
+          </li>
+          <li>
+            <time datetime="15:00">15:00</time>
+            <div>
+              <h3>Sektempfang</h3>
+              <p>Anstoßen, Kuchen und Fotos im Schlossgarten.</p>
+            </div>
+          </li>
+          <li>
+            <time datetime="18:30">18:30</time>
+            <div>
+              <h3>Abendessen</h3>
+              <p>Drei Gänge im Rittersaal.</p>
+            </div>
+          </li>
+          <li>
+            <time datetime="21:00">21:00</time>
+            <div>
+              <h3>Feiern</h3>
+              <p>Musik, Tanz und Mitternachtssnack.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="anreise" class="travel">
+      <div class="wrap">
+        <h2>Anreise</h2>
+        <div class="travel-grid">
+          <div>
+            <h3>Schloss Egg</h3>
+            <address>
+              Egg 1<br>
+              94505 Bernried<br>
+              bei Deggendorf
+            </address>
+            <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Schloss+Egg+Bernried" target="_blank" rel="noopener">In Google Maps öffnen</a>
+          </div>
+          <div>
+            <h3>Parken</h3>
+            <p>Direkt am Schloss gibt es kostenlose Parkplätze.</p>
+          </div>
+        </div>
+
+        <div class="shuttle">
+          <h3>Shuttle-Bus ab Regensburg</h3>
+          <p>Wir haben einen Bus organisiert, damit ihr nicht selbst fahren müsst. Sagt uns bei der Zusage einfach Bescheid, ob ihr mitfahrt.</p>
+          <dl class="rides">
+            <div>
+              <dt>Hinfahrt</dt>
+              <dd><strong>12:00 Uhr</strong> ab Regensburg Hauptbahnhof, am Wendehammer</dd>
+            </div>
+            <div>
+              <dt>Rückfahrt</dt>
+              <dd><strong>0:15 Uhr</strong> nachts ab Schloss Egg in Bernried, zurück zum Regensburger Hauptbahnhof</dd>
+            </div>
+            <div>
+              <dt>Kosten</dt>
+              <dd><strong>15 €</strong> pro Person, bitte bar bei unseren Trauzeugen bezahlen</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="stay">
+          <h3>Übernachten in Metten</h3>
+          <p>Metten liegt etwa 15 Minuten vom Schloss entfernt. Bucht am besten früh, im August ist viel los.</p>
+          <ul class="hotels">
+            <li>
+              <strong>Gasthof Zum Kloster (Mettner Hof)</strong>
+              <span>Neuhausener Straße 2, 94526 Metten</span>
+              <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Gasthof+Zum+Kloster+Neuhausener+Stra%C3%9Fe+2+Metten" target="_blank" rel="noopener">Auf der Karte ansehen</a>
+            </li>
+            <li>
+              <strong>Pension Grabmeier-Keller</strong>
+              <span>Deggendorfer Straße 27, 94526 Metten</span>
+              <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Pension+Grabmeier-Keller+Metten" target="_blank" rel="noopener">Auf der Karte ansehen</a>
+            </li>
+            <li>
+              <strong>Hotel-Gasthof Höttl</strong>
+              <span>Luitpoldplatz 22, 94469 Deggendorf, etwa 3 km von Metten</span>
+              <a class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=Hotel+Gasthof+H%C3%B6ttl+Deggendorf" target="_blank" rel="noopener">Auf der Karte ansehen</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="menue" class="menu">
+      <div class="wrap">
+        <h2>Das Menü</h2>
+        <p class="menu-lead">Vorspeise und Nachspeise sind für alle gleich. Beim Hauptgang habt ihr die Wahl – sagt uns bei der Zusage, was ihr möchtet.</p>
+
+        <div class="course">
+          <p class="course-name">Vorspeise</p>
+          <h3>Burrata mit Ochsenherztomaten</h3>
+          <p>Basilikumöl, geröstetes Sauerteigbrot</p>
+        </div>
+
+        <div class="course">
+          <p class="course-name">Hauptgang</p>
+          <ul class="choices">
+            <li>
+              <h3>Rosa gebratener Kalbsrücken</h3>
+              <p>Pfifferlinge, Kartoffelgratin, Rotweinjus</p>
+            </li>
+            <li class="or">oder</li>
+            <li>
+              <h3>Zanderfilet auf der Haut</h3>
+              <p>Rieslingsauce, junges Gartengemüse, Petersilienkartoffeln</p>
+            </li>
+            <li class="or">oder</li>
+            <li>
+              <h3>Ricotta-Gnocchi</h3>
+              <p>Salbeibutter, Ofentomaten, Bergkäse (vegetarisch)</p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="course">
+          <p class="course-name">Nachspeise</p>
+          <h3>Holunderblüten-Panna-cotta</h3>
+          <p>Waldbeeren, Mandelkrokant</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="zusage">
+      <div class="wrap">
+        <div class="rsvp-head">
+          <h2>Zusagen</h2>
+          <p>Bitte gebt uns bis zum 1. Juni 2027 Bescheid. Ihr könnt alle Personen eurer Einladung in einer Antwort eintragen.</p>
+        </div>
+
+        <form id="rsvp" name="zusage" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="form-name" value="zusage">
+          <input type="hidden" name="gaeste" value="">
+          <input type="hidden" name="anzahl_personen" value="">
+          <p class="hp"><label>Nicht ausfüllen <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+
+          <fieldset>
+            <legend>Seid ihr dabei?</legend>
+            <div class="attend">
+              <label class="pill">
+                <input type="radio" name="teilnahme" value="Ja" required>
+                <span class="pill-text"><strong>Ja, wir kommen</strong></span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="teilnahme" value="Nein">
+                <span class="pill-text"><strong>Leider nicht</strong></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div id="guests"></div>
+
+          <button type="button" class="add" id="add-guest">Weitere Person hinzufügen</button>
+
+          <fieldset id="shuttle-field">
+            <legend>Fahrt ihr mit dem Shuttle-Bus ab Regensburg? <span class="hint">(15 € pro Person, zahlbar bei den Trauzeugen)</span></legend>
+            <div class="attend">
+              <label class="pill">
+                <input type="radio" name="shuttle" value="Hin und zurück" required>
+                <span class="pill-text"><strong>Hin und zurück</strong></span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="shuttle" value="Nur Hinfahrt">
+                <span class="pill-text"><strong>Nur Hinfahrt</strong></span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="shuttle" value="Nur Rückfahrt">
+                <span class="pill-text"><strong>Nur Rückfahrt</strong></span>
+              </label>
+              <label class="pill">
+                <input type="radio" name="shuttle" value="Nein">
+                <span class="pill-text"><strong>Wir fahren selbst</strong></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field" id="allergy-field">
+            <label class="label" for="allergien">Allergien oder Unverträglichkeiten <span class="hint">(optional)</span></label>
+            <textarea id="allergien" name="allergien" rows="3" placeholder="z. B. Nüsse, Laktose – bitte mit Namen, falls es nur eine Person betrifft"></textarea>
+          </div>
+
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+
+          <button type="submit" class="btn btn-dark" id="submit">Antwort senden</button>
+        </form>
+
+        <div class="thanks" id="thanks" hidden tabindex="-1">
+          <h3 id="thanks-title"></h3>
+          <p id="thanks-text"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p class="sig">Elli &amp; Leo</p>
+    <p>14. August 2027 auf Schloss Egg</p>
+  </footer>
+
+  <template id="guest-tpl">
+    <div class="guest">
+      <div class="guest-head">
+        <p class="guest-title"></p>
+        <button type="button" class="remove">Entfernen</button>
+      </div>
+      <div class="field">
+        <label class="label">Vor- und Nachname</label>
+        <input type="text" class="guest-name" autocomplete="name" required>
+      </div>
+      <fieldset class="mains">
+        <legend>Hauptgang</legend>
+        <label class="pill">
+          <input type="radio" value="Kalbsrücken" required>
+          <span class="pill-text"><strong>Kalbsrücken</strong><small>Pfifferlinge, Kartoffelgratin</small></span>
+        </label>
+        <label class="pill">
+          <input type="radio" value="Zander">
+          <span class="pill-text"><strong>Zanderfilet</strong><small>Rieslingsauce, Gartengemüse</small></span>
+        </label>
+        <label class="pill">
+          <input type="radio" value="Gnocchi (vegetarisch)">
+          <span class="pill-text"><strong>Ricotta-Gnocchi</strong><small>vegetarisch, Salbeibutter</small></span>
+        </label>
+      </fieldset>
+    </div>
+  </template>
+
+  <script>
+    (function () {
+      const form = document.getElementById('rsvp');
+      const list = document.getElementById('guests');
+      const tpl = document.getElementById('guest-tpl');
+      const addBtn = document.getElementById('add-guest');
+      const errorEl = document.getElementById('form-error');
+      const allergyField = document.getElementById('allergy-field');
+      const shuttleField = document.getElementById('shuttle-field');
+      const submitBtn = document.getElementById('submit');
+      let counter = 0;
+
+      function attending() {
+        const checked = form.querySelector('input[name="teilnahme"]:checked');
+        return checked ? checked.value === 'Ja' : null;
+      }
+
+      function renumber() {
+        const guests = list.querySelectorAll('.guest');
+        guests.forEach((g, i) => {
+          g.querySelector('.guest-title').textContent = guests.length === 1 ? 'Gast' : 'Person ' + (i + 1);
+          g.querySelector('.remove').hidden = guests.length === 1;
+        });
+      }
+
+      function addGuest(focus) {
+        counter += 1;
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        const nameId = 'guest-name-' + counter;
+        node.querySelector('label.label').htmlFor = nameId;
+        node.querySelector('.guest-name').id = nameId;
+        node.querySelectorAll('.mains input').forEach(r => { r.name = 'hauptgang-' + counter; });
+        node.querySelector('.remove').addEventListener('click', () => {
+          node.remove();
+          renumber();
+          addBtn.focus();
+        });
+        list.appendChild(node);
+        syncAttendance();
+        renumber();
+        if (focus) node.querySelector('.guest-name').focus();
+      }
+
+      function syncAttendance() {
+        const yes = attending() !== false;
+        list.querySelectorAll('.mains').forEach(fs => {
+          fs.hidden = !yes;
+          fs.disabled = !yes;
+        });
+        allergyField.hidden = !yes;
+        shuttleField.hidden = !yes;
+        shuttleField.disabled = !yes;
+      }
+
+      form.addEventListener('change', e => {
+        if (e.target.name === 'teilnahme') syncAttendance();
+        errorEl.hidden = true;
+      });
+      addBtn.addEventListener('click', () => addGuest(true));
+
+      function encode(data) {
+        return Object.keys(data)
+          .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
+          .join('&');
+      }
+
+      function showError(msg, field) {
+        errorEl.textContent = msg;
+        errorEl.hidden = false;
+        if (field) field.focus();
+      }
+
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const yes = attending();
+        if (yes === null) {
+          return showError('Bitte wählt aus, ob ihr kommt.', form.querySelector('input[name="teilnahme"]'));
+        }
+
+        const guests = [];
+        for (const g of list.querySelectorAll('.guest')) {
+          const nameInput = g.querySelector('.guest-name');
+          const name = nameInput.value.trim();
+          if (!name) return showError('Bitte tragt bei jeder Person einen Namen ein.', nameInput);
+          let main = '';
+          if (yes) {
+            const pick = g.querySelector('.mains input:checked');
+            if (!pick) return showError('Bitte wählt für ' + name + ' einen Hauptgang.', g.querySelector('.mains input'));
+            main = pick.value;
+          }
+          guests.push(yes ? name + ': ' + main : name);
+        }
+
+        const shuttle = form.querySelector('input[name="shuttle"]:checked');
+        if (yes && !shuttle) {
+          return showError('Bitte sagt uns, ob ihr mit dem Shuttle-Bus fahrt.', form.querySelector('input[name="shuttle"]'));
+        }
+
+        const data = {
+          'form-name': 'zusage',
+          'bot-field': form.querySelector('input[name="bot-field"]').value,
+          teilnahme: yes ? 'Ja' : 'Nein',
+          anzahl_personen: String(guests.length),
+          gaeste: guests.join('\n'),
+          shuttle: yes ? shuttle.value : '',
+          allergien: yes ? form.allergien.value.trim() : ''
+        };
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Wird gesendet …';
+        try {
+          const res = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: encode(data)
+          });
+          if (!res.ok) throw new Error(res.status);
+
+          const first = guests[0].split(':')[0];
+          document.getElementById('thanks-title').textContent = yes ? 'Danke, ' + first + '!' : 'Schade, ' + first + '.';
+          document.getElementById('thanks-text').textContent = yes
+            ? 'Eure Zusage ist bei uns angekommen. Wir freuen uns riesig auf euch!'
+            : 'Danke, dass ihr Bescheid gebt. Wir denken an euch und feiern ein Glas mit.';
+          form.hidden = true;
+          const thanks = document.getElementById('thanks');
+          thanks.hidden = false;
+          thanks.focus();
+        } catch (err) {
+          showError('Eure Antwort konnte nicht gesendet werden. Prüft eure Internetverbindung und versucht es noch einmal.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Antwort senden';
+        }
+      });
+
+      addGuest(false);
+    })();
+  </script>
+</body>
+</html>
