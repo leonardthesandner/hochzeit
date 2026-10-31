@@ -1399,6 +1399,32 @@
       });
       addBtn.addEventListener('click', () => addGuest(true));
 
+      // „Anna“, „Anna und Max“, „Anna, Max und Rosi“
+      function joinNames(names) {
+        return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' und ' + names[names.length - 1];
+      }
+
+      // Danke-Text für jede Kombination aus Zu- und Absagen, immer mit Vornamen.
+      // Bei einer Person wird geduzt, bei mehreren werden alle beim Namen genannt.
+      function thanksMessage(people) {
+        const yes = people.filter(p => p.yes).map(p => p.first);
+        const no = people.filter(p => !p.yes).map(p => p.first);
+        let text;
+        if (people.length === 1) {
+          text = yes.length
+            ? 'Deine Zusage ist bei uns angekommen. Wir freuen uns riesig auf dich, ' + yes[0] + '!'
+            : 'Deine Absage ist bei uns angekommen. Schade, dass du nicht dabei sein kannst, ' + no[0] + ' – wir trinken ein Glas auf dich.';
+        } else if (!no.length) {
+          text = 'Eure Zusagen sind bei uns angekommen. Wir freuen uns riesig auf euch, ' + joinNames(yes) + '!';
+        } else if (!yes.length) {
+          text = 'Eure Absagen sind bei uns angekommen. Schade, dass ihr nicht dabei sein könnt, ' + joinNames(no) + ' – wir trinken ein Glas auf euch.';
+        } else {
+          text = 'Eure Antwort ist bei uns angekommen. Wir freuen uns riesig auf ' + joinNames(yes) + '! '
+            + 'Schade, dass ' + joinNames(no) + ' nicht dabei sein ' + (no.length === 1 ? 'kann' : 'können') + '.';
+        }
+        return { title: 'Vielen Dank!', text };
+      }
+
       function showError(msg, field) {
         errorEl.textContent = msg;
         errorEl.hidden = false;
@@ -1410,6 +1436,7 @@
 
         const lines = [];
         const allergies = [];
+        const people = [];
         let yesCount = 0;
         let noCount = 0;
         let first = '';
@@ -1422,6 +1449,7 @@
           if (yes === null) {
             return showError(t('Bitte sag uns, ob du kommst.', 'Bitte wählt für ' + name + ' Zusagen oder Absagen.'), g.querySelector('.answer input'));
           }
+          people.push({ first: name.split(/\s+/)[0], yes });
           if (!yes) {
             noCount++;
             lines.push(name + ': Absage');
@@ -1466,18 +1494,7 @@
           });
           if (!res.ok) throw new Error(res.status);
 
-          let title;
-          let text;
-          if (!yesCount) {
-            title = 'Schade, ' + first + '.';
-            text = t('Danke, dass du Bescheid gibst. Wir denken an dich und trinken ein Glas auf dich.', 'Danke, dass ihr Bescheid gebt. Wir denken an euch und trinken ein Glas auf euch.');
-          } else if (!noCount) {
-            title = 'Danke, ' + first + '!';
-            text = t('Deine Zusage ist bei uns angekommen. Wir freuen uns riesig auf dich!', 'Eure Zusage ist bei uns angekommen. Wir freuen uns riesig auf euch!');
-          } else {
-            title = 'Danke, ' + first + '!';
-            text = 'Eure Antwort ist bei uns angekommen. Wir freuen uns riesig auf alle, die dabei sind!';
-          }
+          const { title, text } = thanksMessage(people);
           document.getElementById('thanks-title').textContent = title;
           document.getElementById('thanks-text').textContent = text;
           form.hidden = true;
