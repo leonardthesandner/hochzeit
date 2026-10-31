@@ -1500,7 +1500,10 @@
           form.hidden = true;
           const thanks = document.getElementById('thanks');
           thanks.hidden = false;
-          thanks.focus();
+          // Bestätigung in die Bildschirmmitte holen, auch am Handy
+          thanks.focus({ preventScroll: true });
+          const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+          requestAnimationFrame(() => thanks.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' }));
         } catch (err) {
           showError(t('Deine Antwort konnte nicht gesendet werden. Prüf deine Internetverbindung und versuch es noch einmal.', 'Eure Antwort konnte nicht gesendet werden. Prüft eure Internetverbindung und versucht es noch einmal.'));
         } finally {
