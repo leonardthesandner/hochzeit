@@ -1444,6 +1444,7 @@
       const barFill = document.getElementById('upbar-fill');
       const retryBtn = document.getElementById('upbar-retry');
       const shown = new Set();
+      const tiles = new Map();
       const pendingByPath = new Map();
       let oldest = null;
 
@@ -1517,13 +1518,25 @@
           own.img.onload = () => URL.revokeObjectURL(preview);
           own.img.src = publicUrl(smallPath(foto.pfad));
           bindOpen(own, foto);
+          tiles.set(foto.id, own);
           return;
         }
         const tile = makeTile(foto.name);
         tile.img.loading = 'lazy';
+        // Datei wurde gelöscht, der Eintrag aber noch nicht: Kachel ausblenden
+        tile.img.onerror = () => removeTile(foto.id);
         tile.img.src = publicUrl(smallPath(foto.pfad));
         bindOpen(tile, foto);
         place(tile.li, atTop);
+        tiles.set(foto.id, tile);
+      }
+
+      function removeTile(id) {
+        const tile = tiles.get(id);
+        if (!tile) return;
+        tiles.delete(id);
+        tile.li.remove();
+        empty.hidden = gallery.children.length > 0;
       }
 
       async function load() {
@@ -1547,6 +1560,7 @@
       // Fotos anderer Gäste erscheinen ohne Neuladen
       db.channel('fotos')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fotos' }, p => render(p.new, true))
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'fotos' }, p => removeTile(p.old.id))
         .subscribe();
 
       // ---------- Fortschrittsleiste ----------
