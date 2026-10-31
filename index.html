@@ -629,6 +629,118 @@
     }
     footer .kicker { font-size: 0.875rem; color: var(--ink-soft); }
 
+    /* ---------- Gästefotos ---------- */
+    .fotos-head p { color: var(--ink-soft); max-width: var(--measure); margin: 1.5rem auto 0; }
+
+    .upload {
+      max-width: 34rem;
+      margin: 0 auto 3rem;
+      text-align: left;
+    }
+    .upload .field { margin-bottom: 1rem; }
+    .drop {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 1.75rem 1rem;
+      border: 1px dashed var(--olive);
+      border-radius: 3px;
+      background: var(--paper);
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+    .drop:hover { background: var(--paper-deep); }
+    .drop:has(input:focus-visible) { outline: 2px solid var(--olive); outline-offset: 2px; }
+    .drop strong { font-weight: 600; font-size: 1.125rem; color: var(--olive-dark); }
+    .drop small { color: var(--ink-soft); font-size: 0.9375rem; }
+    .drop svg { width: 1.75rem; height: 1.75rem; color: var(--olive); }
+    .drop input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+    .drop.busy { opacity: 0.6; pointer-events: none; }
+    .upload-status { margin: 0.75rem 0 0; min-height: 1.6em; text-align: center; color: var(--ink-soft); }
+    .upload-status.error { color: var(--error); }
+
+    .gallery {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(10rem, 42vw), 1fr));
+      gap: 0.75rem;
+    }
+    .gallery button {
+      display: block;
+      width: 100%;
+      padding: 0.375rem;
+      border: 1px solid var(--line);
+      background: var(--paper-light);
+      cursor: zoom-in;
+      font: inherit;
+      color: inherit;
+    }
+    .gallery img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: var(--paper-deep);
+    }
+    .gallery .by {
+      display: block;
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--ink-soft);
+      padding-top: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .gallery li.neu { animation: fade 0.8s ease-out both; }
+    }
+    .gallery-empty { text-align: center; color: var(--ink-soft); font-style: italic; }
+    .more { display: flex; margin: 2rem auto 0; }
+
+    .lightbox {
+      border: 0;
+      padding: 0;
+      max-width: min(92vw, 70rem);
+      max-height: 92svh;
+      background: transparent;
+    }
+    .lightbox::backdrop { background: rgba(40, 33, 24, 0.82); }
+    .lightbox img {
+      display: block;
+      max-width: 100%;
+      max-height: calc(92svh - 4rem);
+      margin: 0 auto;
+      border: 0.5rem solid var(--paper-light);
+    }
+    .lightbox-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      color: var(--paper-light);
+      padding-top: 0.5rem;
+    }
+    .lightbox-bar button {
+      background: none;
+      border: 1px solid rgba(248, 238, 226, 0.6);
+      color: var(--paper-light);
+      font: inherit;
+      min-height: 44px;
+      padding: 0 1rem;
+      cursor: pointer;
+    }
+
     @media (max-width: 59.99rem) {
       .hero-text {
         align-self: stretch;
@@ -654,7 +766,7 @@
     @media (max-width: 34rem) {
       .timeline li { grid-template-columns: 1fr; gap: 0.125rem; }
       .attend { grid-template-columns: 1fr; }
-      .nav { gap: 0 0.875rem; font-size: 0.75rem; }
+      .nav { gap: 0 0.7rem; font-size: 0.75rem; }
       .nav a { letter-spacing: 0.1em; }
     }
   </style>
@@ -677,6 +789,7 @@
     <a href="#anreise">Anreise</a>
     <a href="#menue">Menü</a>
     <a href="#zusage">Zusage</a>
+    <a href="#fotos">Fotos</a>
   </nav>
 
   <header class="hero framed">
@@ -979,6 +1092,41 @@
         </div>
       </div>
     </section>
+    <section id="fotos">
+      <div class="wrap">
+        <div class="sec-head fotos-head">
+          <h2>Eure Fotos</h2>
+          <svg class="orn" aria-hidden="true"><use href="#orn"/></svg>
+          <p>Teilt eure schönsten Momente vom Tag. Jedes Foto erscheint sofort hier und alle Gäste können es sehen.</p>
+        </div>
+
+        <form class="upload box" id="upload">
+          <div class="field">
+            <label class="label" for="foto-name">Dein Name <span class="hint">(optional)</span></label>
+            <input type="text" id="foto-name" maxlength="60" autocomplete="name">
+          </div>
+          <label class="drop" id="drop">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            <strong>Fotos auswählen</strong>
+            <small>Du kannst mehrere auf einmal hochladen.</small>
+            <input type="file" id="foto-input" accept="image/*" multiple>
+          </label>
+          <p class="upload-status" id="upload-status" role="status"></p>
+        </form>
+
+        <ul class="gallery" id="gallery"></ul>
+        <p class="gallery-empty" id="gallery-empty">Noch keine Fotos. Am Hochzeitstag könnt ihr hier eure Bilder teilen.</p>
+        <button type="button" class="btn more" id="more" hidden>Weitere Fotos laden</button>
+      </div>
+    </section>
+
+    <dialog class="lightbox" id="lightbox">
+      <img alt="">
+      <div class="lightbox-bar">
+        <span id="lightbox-by"></span>
+        <button type="button" id="lightbox-close">Schließen</button>
+      </div>
+    </dialog>
   </main>
 
   <footer>
@@ -1181,6 +1329,162 @@
         }, { passive: true });
         dispatchEvent(new Event('scroll'));
       }
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script>
+    (function () {
+      // Zugangsdaten aus Supabase: Project Settings → API (Project URL und anon/publishable key)
+      const SUPABASE_URL = 'https://jgodjulptdlbogmqdycc.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_DL38CqPQVMF3AkJEwgeKCw_l6QbXyL7';
+      const BUCKET = 'gaestefotos';
+      const PAGE = 48;
+
+      const gallery = document.getElementById('gallery');
+      const empty = document.getElementById('gallery-empty');
+      const more = document.getElementById('more');
+      const input = document.getElementById('foto-input');
+      const drop = document.getElementById('drop');
+      const nameInput = document.getElementById('foto-name');
+      const status = document.getElementById('upload-status');
+      const lightbox = document.getElementById('lightbox');
+      const shown = new Set();
+      let oldest = null;
+
+      function setStatus(text, isError) {
+        status.textContent = text;
+        status.classList.toggle('error', !!isError);
+      }
+
+      if (!SUPABASE_URL || !SUPABASE_KEY || !window.supabase) {
+        drop.classList.add('busy');
+        input.disabled = true;
+        setStatus('Die Fotogalerie wird gerade eingerichtet.');
+        return;
+      }
+
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const publicUrl = path => db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+      const smallPath = path => path.replace(/\.jpg$/, '_klein.jpg');
+
+      try { nameInput.value = localStorage.getItem('foto-name') || ''; } catch (e) {}
+
+      function render(foto, atTop) {
+        if (shown.has(foto.id)) return;
+        shown.add(foto.id);
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        const img = document.createElement('img');
+        img.src = publicUrl(smallPath(foto.pfad));
+        img.loading = 'lazy';
+        img.alt = foto.name ? 'Foto von ' + foto.name : 'Gästefoto';
+        btn.appendChild(img);
+        if (foto.name) {
+          const by = document.createElement('span');
+          by.className = 'by';
+          by.textContent = foto.name;
+          btn.appendChild(by);
+        }
+        btn.addEventListener('click', () => {
+          const big = lightbox.querySelector('img');
+          big.src = publicUrl(foto.pfad);
+          big.alt = img.alt;
+          document.getElementById('lightbox-by').textContent = foto.name ? 'Von ' + foto.name : '';
+          lightbox.showModal();
+        });
+        li.appendChild(btn);
+        if (atTop) {
+          li.className = 'neu';
+          gallery.prepend(li);
+        } else {
+          gallery.appendChild(li);
+        }
+        empty.hidden = true;
+      }
+
+      async function load() {
+        let q = db.from('fotos').select('id, created_at, pfad, name')
+          .order('created_at', { ascending: false }).limit(PAGE);
+        if (oldest) q = q.lt('created_at', oldest);
+        const { data, error } = await q;
+        if (error) {
+          setStatus('Die Fotos konnten nicht geladen werden. Lade die Seite neu.', true);
+          return;
+        }
+        data.forEach(f => render(f, false));
+        if (data.length) oldest = data[data.length - 1].created_at;
+        more.hidden = data.length < PAGE;
+      }
+
+      more.addEventListener('click', load);
+      document.getElementById('lightbox-close').addEventListener('click', () => lightbox.close());
+      lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.close(); });
+
+      // Fotos anderer Gäste erscheinen ohne Neuladen
+      db.channel('fotos')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fotos' }, p => render(p.new, true))
+        .subscribe();
+
+      // Verkleinert ein Bild auf höchstens max Pixel Kantenlänge und gibt ein JPEG zurück
+      async function shrink(file, max, quality) {
+        const url = URL.createObjectURL(file);
+        try {
+          const img = new Image();
+          img.src = url;
+          await img.decode();
+          const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.naturalWidth * scale);
+          canvas.height = Math.round(img.naturalHeight * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          return await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob')), 'image/jpeg', quality));
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      }
+
+      async function upload(file, name) {
+        const path = crypto.randomUUID() + '.jpg';
+        const [big, small] = await Promise.all([shrink(file, 2000, 0.85), shrink(file, 600, 0.8)]);
+        const opts = { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false };
+        const a = await db.storage.from(BUCKET).upload(path, big, opts);
+        if (a.error) throw a.error;
+        const b = await db.storage.from(BUCKET).upload(smallPath(path), small, opts);
+        if (b.error) throw b.error;
+        const { data, error } = await db.from('fotos').insert({ pfad: path, name: name || null }).select().single();
+        if (error) throw error;
+        render(data, true);
+      }
+
+      input.addEventListener('change', async () => {
+        const files = [...input.files];
+        input.value = '';
+        if (!files.length) return;
+        const name = nameInput.value.trim().slice(0, 60);
+        try { localStorage.setItem('foto-name', name); } catch (e) {}
+
+        drop.classList.add('busy');
+        let ok = 0;
+        let failed = 0;
+        for (const [i, file] of files.entries()) {
+          setStatus(files.length > 1 ? 'Lade Foto ' + (i + 1) + ' von ' + files.length + ' hoch …' : 'Lade Foto hoch …');
+          try {
+            await upload(file, name);
+            ok++;
+          } catch (e) {
+            failed++;
+          }
+        }
+        drop.classList.remove('busy');
+        if (failed) {
+          setStatus((failed === 1 ? 'Ein Foto konnte' : failed + ' Fotos konnten') + ' nicht hochgeladen werden. Prüf deine Internetverbindung und versuch es noch einmal.', true);
+        } else {
+          setStatus(ok === 1 ? 'Dein Foto ist online. Danke!' : ok + ' Fotos sind online. Danke!');
+        }
+      });
+
+      load();
     })();
   </script>
 </body>
