@@ -601,6 +601,8 @@
     textarea { resize: vertical; min-height: 6rem; }
 
     .mains { display: grid; gap: 0.625rem; }
+    .guest .answer, .guest .details { margin-bottom: 1.25rem; }
+    .details[hidden] { display: none; }
     .mains[hidden] { display: none; }
 
     .add {
@@ -1165,20 +1167,6 @@
         <form id="rsvp" name="zusage" novalidate>
           <p class="hp"><label>Nicht ausfüllen <input name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
 
-          <fieldset>
-            <legend data-one="Bist du dabei?" data-many="Seid ihr dabei?">Bist du dabei?</legend>
-            <div class="attend">
-              <label class="pill">
-                <input type="radio" name="teilnahme" value="Ja" required>
-                <span class="pill-text"><strong data-one="Ja, ich komme" data-many="Ja, wir kommen">Ja, ich komme</strong></span>
-              </label>
-              <label class="pill">
-                <input type="radio" name="teilnahme" value="Nein">
-                <span class="pill-text"><strong>Leider nicht</strong></span>
-              </label>
-            </div>
-          </fieldset>
-
           <div id="guests"></div>
 
           <button type="button" class="add" id="add-guest">Weitere Person hinzufügen</button>
@@ -1204,11 +1192,6 @@
               </label>
             </div>
           </fieldset>
-
-          <div class="field" id="allergy-field">
-            <label class="label" for="allergien">Allergien oder Unverträglichkeiten <span class="hint">(optional)</span></label>
-            <textarea id="allergien" name="allergien" rows="3" placeholder="z. B. Nüsse, Laktose – bitte mit Namen, falls es nur eine Person betrifft"></textarea>
-          </div>
 
           <p class="form-error" id="form-error" role="alert" hidden></p>
 
@@ -1291,23 +1274,42 @@
         <button type="button" class="remove">Entfernen</button>
       </div>
       <div class="field">
-        <label class="label">Vor- und Nachname</label>
+        <label class="label name-label">Vor- und Nachname</label>
         <input type="text" class="guest-name" autocomplete="name" required>
       </div>
-      <fieldset class="mains">
-        <legend>Hauptgang</legend>
-        <label class="pill">
-          <input type="radio" value="Kalbsrücken" required>
-          <span class="pill-text"><strong>Kalbsrücken</strong><small>Pfifferlinge, Kartoffelgratin</small></span>
-        </label>
-        <label class="pill">
-          <input type="radio" value="Zander">
-          <span class="pill-text"><strong>Zanderfilet</strong><small>Rieslingsauce, Gartengemüse</small></span>
-        </label>
-        <label class="pill">
-          <input type="radio" value="Gnocchi (vegetarisch)">
-          <span class="pill-text"><strong>Ricotta-Gnocchi</strong><small>vegetarisch, Salbeibutter</small></span>
-        </label>
+      <fieldset class="answer">
+        <legend>Bist du dabei?</legend>
+        <div class="attend">
+          <label class="pill">
+            <input type="radio" value="Ja" required>
+            <span class="pill-text"><strong>Zusagen</strong></span>
+          </label>
+          <label class="pill">
+            <input type="radio" value="Nein">
+            <span class="pill-text"><strong>Absagen</strong></span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset class="details" hidden disabled>
+        <fieldset class="mains">
+          <legend>Hauptgang</legend>
+          <label class="pill">
+            <input type="radio" value="Kalbsrücken" required>
+            <span class="pill-text"><strong>Kalbsrücken</strong><small>Pfifferlinge, Kartoffelgratin</small></span>
+          </label>
+          <label class="pill">
+            <input type="radio" value="Zander">
+            <span class="pill-text"><strong>Zanderfilet</strong><small>Rieslingsauce, Gartengemüse</small></span>
+          </label>
+          <label class="pill">
+            <input type="radio" value="Gnocchi (vegetarisch)">
+            <span class="pill-text"><strong>Ricotta-Gnocchi</strong><small>vegetarisch, Salbeibutter</small></span>
+          </label>
+        </fieldset>
+        <div class="field">
+          <label class="label allergy-label">Allergien oder Unverträglichkeiten <span class="hint">(optional)</span></label>
+          <input type="text" class="guest-allergy" maxlength="200" placeholder="z. B. Nüsse, Laktose">
+        </div>
       </fieldset>
     </div>
   </template>
@@ -1322,68 +1324,78 @@
       const tpl = document.getElementById('guest-tpl');
       const addBtn = document.getElementById('add-guest');
       const errorEl = document.getElementById('form-error');
-      const allergyField = document.getElementById('allergy-field');
       const shuttleField = document.getElementById('shuttle-field');
       const submitBtn = document.getElementById('submit');
       let counter = 0;
 
-      function attending() {
-        const checked = form.querySelector('input[name="teilnahme"]:checked');
+      const guestNodes = () => [...list.querySelectorAll('.guest')];
+
+      // Zusage (true), Absage (false) oder noch nichts gewählt (null)
+      function answer(g) {
+        const checked = g.querySelector('.answer input:checked');
         return checked ? checked.value === 'Ja' : null;
       }
 
       // Bei einer Person wird geduzt, ab zwei Personen „ihr“
       function many() {
-        return list.querySelectorAll('.guest').length > 1;
+        return guestNodes().length > 1;
       }
 
       function t(one, plural) {
         return many() ? plural : one;
       }
 
-      function renumber() {
-        const guests = list.querySelectorAll('.guest');
+      function sync() {
+        const guests = guestNodes();
         guests.forEach((g, i) => {
           g.querySelector('.guest-title').textContent = guests.length === 1 ? 'Gast' : 'Person ' + (i + 1);
           g.querySelector('.remove').hidden = guests.length === 1;
+          // Wer das Formular ausfüllt, wird geduzt, alle weiteren beim Namen genannt
+          const name = g.querySelector('.guest-name').value.trim();
+          g.querySelector('.answer legend').textContent = i === 0 ? 'Bist du dabei?' : 'Ist ' + (name || 'diese Person') + ' dabei?';
+          // Hauptgang und Allergien nur bei Zusage
+          const details = g.querySelector('.details');
+          details.hidden = answer(g) !== true;
+          details.disabled = answer(g) !== true;
         });
         form.querySelectorAll('[data-one]').forEach(el => {
           el.textContent = t(el.dataset.one, el.dataset.many);
+        });
+        // Die Shuttle-Frage gilt für alle, die zusagen
+        const coming = guests.filter(g => answer(g) === true).length;
+        shuttleField.hidden = coming === 0;
+        shuttleField.disabled = coming === 0;
+        shuttleField.querySelectorAll('[data-one]').forEach(el => {
+          el.textContent = coming > 1 ? el.dataset.many : el.dataset.one;
         });
       }
 
       function addGuest(focus) {
         counter += 1;
         const node = tpl.content.firstElementChild.cloneNode(true);
-        const nameId = 'guest-name-' + counter;
-        node.querySelector('label.label').htmlFor = nameId;
-        node.querySelector('.guest-name').id = nameId;
-        node.querySelectorAll('.mains input').forEach(r => { r.name = 'hauptgang-' + counter; });
+        const id = 'guest-' + counter;
+        node.querySelector('.name-label').htmlFor = id + '-name';
+        node.querySelector('.guest-name').id = id + '-name';
+        node.querySelector('.allergy-label').htmlFor = id + '-allergy';
+        node.querySelector('.guest-allergy').id = id + '-allergy';
+        node.querySelectorAll('.answer input').forEach(r => { r.name = id + '-teilnahme'; });
+        node.querySelectorAll('.mains input').forEach(r => { r.name = id + '-hauptgang'; });
         node.querySelector('.remove').addEventListener('click', () => {
           node.remove();
-          renumber();
+          sync();
           addBtn.focus();
         });
         list.appendChild(node);
-        syncAttendance();
-        renumber();
+        sync();
         if (focus) node.querySelector('.guest-name').focus();
       }
 
-      function syncAttendance() {
-        const yes = attending() !== false;
-        list.querySelectorAll('.mains').forEach(fs => {
-          fs.hidden = !yes;
-          fs.disabled = !yes;
-        });
-        allergyField.hidden = !yes;
-        shuttleField.hidden = !yes;
-        shuttleField.disabled = !yes;
-      }
-
-      form.addEventListener('change', e => {
-        if (e.target.name === 'teilnahme') syncAttendance();
+      form.addEventListener('change', () => {
+        sync();
         errorEl.hidden = true;
+      });
+      form.addEventListener('input', e => {
+        if (e.target.classList.contains('guest-name')) sync();
       });
       addBtn.addEventListener('click', () => addGuest(true));
 
@@ -1395,38 +1407,53 @@
 
       form.addEventListener('submit', async e => {
         e.preventDefault();
-        const yes = attending();
-        if (yes === null) {
-          return showError(t('Bitte wähle aus, ob du kommst.', 'Bitte wählt aus, ob ihr kommt.'), form.querySelector('input[name="teilnahme"]'));
-        }
 
-        const guests = [];
-        for (const g of list.querySelectorAll('.guest')) {
+        const lines = [];
+        const allergies = [];
+        let yesCount = 0;
+        let noCount = 0;
+        let first = '';
+        for (const g of guestNodes()) {
           const nameInput = g.querySelector('.guest-name');
           const name = nameInput.value.trim();
           if (!name) return showError(t('Bitte trag deinen Namen ein.', 'Bitte tragt bei jeder Person einen Namen ein.'), nameInput);
-          let main = '';
-          if (yes) {
-            const pick = g.querySelector('.mains input:checked');
-            if (!pick) return showError(t('Bitte wähle deinen Hauptgang.', 'Bitte wählt für ' + name + ' einen Hauptgang.'), g.querySelector('.mains input'));
-            main = pick.value;
+          if (!first) first = name;
+          const yes = answer(g);
+          if (yes === null) {
+            return showError(t('Bitte sag uns, ob du kommst.', 'Bitte wählt für ' + name + ' Zusagen oder Absagen.'), g.querySelector('.answer input'));
           }
-          guests.push(yes ? name + ': ' + main : name);
+          if (!yes) {
+            noCount++;
+            lines.push(name + ': Absage');
+            continue;
+          }
+          yesCount++;
+          const pick = g.querySelector('.mains input:checked');
+          if (!pick) return showError(t('Bitte wähle deinen Hauptgang.', 'Bitte wählt für ' + name + ' einen Hauptgang.'), g.querySelector('.mains input'));
+          const allergy = g.querySelector('.guest-allergy').value.trim();
+          lines.push(name + ': Zusage – ' + pick.value + (allergy ? ' – Allergien: ' + allergy : ''));
+          if (allergy) allergies.push(name + ': ' + allergy);
         }
 
         const shuttle = form.querySelector('input[name="shuttle"]:checked');
-        if (yes && !shuttle) {
-          return showError(t('Bitte sag uns, ob du mit dem Shuttle-Bus fährst.', 'Bitte sagt uns, ob ihr mit dem Shuttle-Bus fahrt.'), form.querySelector('input[name="shuttle"]'));
+        if (yesCount && !shuttle) {
+          return showError(yesCount > 1 ? 'Bitte sagt uns, ob ihr mit dem Shuttle-Bus fahrt.' : 'Bitte sag uns, ob du mit dem Shuttle-Bus fährst.', form.querySelector('input[name="shuttle"]'));
         }
 
+        const count = (n, one, plural) => n + ' ' + (n === 1 ? one : plural);
+        const subject = lines.length === 1
+          ? (yesCount ? 'Zusage' : 'Absage') + ' von ' + first
+          : 'Antwort von ' + first + ' (' + count(yesCount, 'Zusage', 'Zusagen') + ', ' + count(noCount, 'Absage', 'Absagen') + ')';
+
         const data = {
-          _subject: (yes ? 'Zusage' : 'Absage') + ' von ' + guests[0].split(':')[0],
+          _subject: subject,
           _gotcha: form._gotcha.value,
-          teilnahme: yes ? 'Ja' : 'Nein',
-          anzahl_personen: String(guests.length),
-          gaeste: guests.join('\n'),
-          shuttle: yes ? shuttle.value : '',
-          allergien: yes ? form.allergien.value.trim() : ''
+          zusagen: String(yesCount),
+          absagen: String(noCount),
+          anzahl_personen: String(lines.length),
+          gaeste: lines.join('\n'),
+          shuttle: yesCount ? shuttle.value : '',
+          allergien: allergies.join('\n')
         };
 
         submitBtn.disabled = true;
@@ -1439,11 +1466,20 @@
           });
           if (!res.ok) throw new Error(res.status);
 
-          const first = guests[0].split(':')[0];
-          document.getElementById('thanks-title').textContent = yes ? 'Danke, ' + first + '!' : 'Schade, ' + first + '.';
-          document.getElementById('thanks-text').textContent = yes
-            ? t('Deine Zusage ist bei uns angekommen. Wir freuen uns riesig auf dich!', 'Eure Zusage ist bei uns angekommen. Wir freuen uns riesig auf euch!')
-            : t('Danke, dass du Bescheid gibst. Wir denken an dich und trinken ein Glas auf dich.', 'Danke, dass ihr Bescheid gebt. Wir denken an euch und trinken ein Glas auf euch.');
+          let title;
+          let text;
+          if (!yesCount) {
+            title = 'Schade, ' + first + '.';
+            text = t('Danke, dass du Bescheid gibst. Wir denken an dich und trinken ein Glas auf dich.', 'Danke, dass ihr Bescheid gebt. Wir denken an euch und trinken ein Glas auf euch.');
+          } else if (!noCount) {
+            title = 'Danke, ' + first + '!';
+            text = t('Deine Zusage ist bei uns angekommen. Wir freuen uns riesig auf dich!', 'Eure Zusage ist bei uns angekommen. Wir freuen uns riesig auf euch!');
+          } else {
+            title = 'Danke, ' + first + '!';
+            text = 'Eure Antwort ist bei uns angekommen. Wir freuen uns riesig auf alle, die dabei sind!';
+          }
+          document.getElementById('thanks-title').textContent = title;
+          document.getElementById('thanks-text').textContent = text;
           form.hidden = true;
           const thanks = document.getElementById('thanks');
           thanks.hidden = false;
