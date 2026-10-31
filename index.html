@@ -731,6 +731,35 @@
       color: var(--paper-light);
       padding-top: 0.5rem;
     }
+    .lightbox-stage { position: relative; }
+    .lb-nav {
+      position: absolute;
+      top: 50%;
+      width: 48px;
+      height: 48px;
+      margin-top: -24px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(248, 238, 226, 0.88);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .lb-nav[hidden] { display: none; }
+    .lb-nav:hover { background: var(--paper-light); }
+    .lb-nav svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .lb-prev { left: 0.875rem; }
+    .lb-next { right: 0.875rem; }
+    .lightbox-count { font-variant-numeric: tabular-nums; opacity: 0.8; }
     .lightbox-bar button {
       background: none;
       border: 1px solid rgba(248, 238, 226, 0.6);
@@ -1199,9 +1228,18 @@
     </section>
 
     <dialog class="lightbox" id="lightbox">
-      <img alt="">
+      <div class="lightbox-stage">
+        <img alt="">
+        <button type="button" class="lb-nav lb-prev" id="lightbox-prev" aria-label="Vorheriges Foto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button type="button" class="lb-nav lb-next" id="lightbox-next" aria-label="Nächstes Foto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
       <div class="lightbox-bar">
         <span id="lightbox-by"></span>
+        <span class="lightbox-count" id="lightbox-count"></span>
         <button type="button" id="lightbox-close">Schließen</button>
       </div>
     </dialog>
@@ -1487,14 +1525,72 @@
 
       function bindOpen(tile, foto) {
         tile.btn.disabled = false;
-        tile.btn.onclick = () => {
-          const big = lightbox.querySelector('img');
-          big.src = publicUrl(foto.pfad);
-          big.alt = tile.img.alt;
-          document.getElementById('lightbox-by').textContent = foto.name ? 'Von ' + foto.name : '';
-          lightbox.showModal();
-        };
+        tile.li.foto = foto;
+        tile.btn.onclick = () => openAt(tile.li);
       }
+
+      // ---------- Großansicht mit Vor und Zurück ----------
+
+      const bigImg = lightbox.querySelector('img');
+      const prevBtn = document.getElementById('lightbox-prev');
+      const nextBtn = document.getElementById('lightbox-next');
+      let current = null;
+
+      const viewable = () => [...gallery.children].filter(li => li.foto);
+
+      function show(li) {
+        current = li;
+        const foto = li.foto;
+        bigImg.src = publicUrl(foto.pfad);
+        bigImg.alt = li.querySelector('img').alt;
+        document.getElementById('lightbox-by').textContent = foto.name ? 'Von ' + foto.name : '';
+        const list = viewable();
+        const i = list.indexOf(li);
+        document.getElementById('lightbox-count').textContent = (i + 1) + ' / ' + list.length + (more.hidden ? '' : '+');
+        prevBtn.hidden = i <= 0;
+        nextBtn.hidden = i >= list.length - 1 && more.hidden;
+        // Nachbarbilder vorladen, damit das Weiterblättern sofort geht
+        [list[i - 1], list[i + 1]].forEach(n => { if (n) new Image().src = publicUrl(n.foto.pfad); });
+      }
+
+      function openAt(li) {
+        show(li);
+        if (!lightbox.open) lightbox.showModal();
+      }
+
+      async function browse(dir) {
+        if (!current) return;
+        let list = viewable();
+        const i = list.indexOf(current);
+        if (dir > 0 && i === list.length - 1 && !more.hidden) {
+          await load();
+          list = viewable();
+        }
+        const target = list[i + dir];
+        if (target) show(target);
+      }
+
+      prevBtn.addEventListener('click', () => browse(-1));
+      nextBtn.addEventListener('click', () => browse(1));
+      lightbox.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); browse(-1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); browse(1); }
+      });
+
+      // Wischen auf dem Handy
+      let touchX = null;
+      let touchY = null;
+      lightbox.addEventListener('touchstart', e => {
+        touchX = e.touches[0].clientX;
+        touchY = e.touches[0].clientY;
+      }, { passive: true });
+      lightbox.addEventListener('touchend', e => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        const dy = e.changedTouches[0].clientY - touchY;
+        touchX = null;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) browse(dx < 0 ? 1 : -1);
+      });
 
       function place(li, atTop) {
         if (atTop) {
@@ -1535,6 +1631,7 @@
         const tile = tiles.get(id);
         if (!tile) return;
         tiles.delete(id);
+        if (tile.li === current && lightbox.open) lightbox.close();
         tile.li.remove();
         empty.hidden = gallery.children.length > 0;
       }
