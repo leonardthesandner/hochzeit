@@ -166,7 +166,23 @@
       align-items: center;
       white-space: nowrap;
     }
-    .nav a:hover { text-decoration: underline; }
+    .nav a:hover { color: var(--olive-dark); }
+    .nav a[aria-current="true"] { color: var(--olive-dark); }
+
+    /* Feiner Strich, der beim Scrollen zum aktuellen Abschnitt wandert */
+    .nav-line {
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      height: 1.5px;
+      width: 0;
+      background: var(--olive-dark);
+      border-radius: 1px;
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: left center;
+      will-change: transform, width, opacity;
+    }
 
     .hero-text {
       position: relative;
@@ -897,6 +913,7 @@
     <a href="#menue">Menü</a>
     <a href="#zusage">Zusage</a>
     <a href="#fotos">Fotos</a>
+    <span class="nav-line" aria-hidden="true"></span>
   </nav>
 
   <header class="hero framed">
@@ -1456,6 +1473,70 @@
         }, { passive: true });
         dispatchEvent(new Event('scroll'));
       }
+    })();
+  </script>
+  <script>
+    (function () {
+      // Der Strich unter der Leiste folgt stufenlos der Scrollposition
+      const nav = document.querySelector('.nav');
+      const line = nav.querySelector('.nav-line');
+      const links = [...nav.querySelectorAll('a')];
+      const sections = links.map(a => document.querySelector(a.getAttribute('href')));
+      let tops = [];
+      let boxes = [];
+
+      function measure() {
+        const navBox = nav.getBoundingClientRect();
+        tops = sections.map(sec => sec.getBoundingClientRect().top + scrollY);
+        boxes = links.map(a => {
+          const r = a.getBoundingClientRect();
+          // Den Buchstabenabstand nach dem letzten Zeichen nicht mitzählen
+          const trail = parseFloat(getComputedStyle(a).letterSpacing) || 0;
+          return { left: r.left - navBox.left, width: r.width - trail };
+        });
+        update();
+      }
+
+      function update() {
+        // Bezugspunkt: knapp unter der Leiste, so steht der Strich genau unter dem Abschnitt, der oben angekommen ist
+        const y = scrollY + nav.offsetHeight + 12;
+        const atBottom = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+        const last = tops.length - 1;
+        let pos;
+        if (atBottom) {
+          pos = last;
+        } else if (y < tops[0]) {
+          pos = 0;
+        } else {
+          let i = 0;
+          while (i < last && y >= tops[i + 1]) i++;
+          pos = i < last ? i + (y - tops[i]) / (tops[i + 1] - tops[i]) : last;
+        }
+        const i = Math.floor(pos);
+        const t = pos - i;
+        const a = boxes[i];
+        const b = boxes[Math.min(i + 1, last)];
+        line.style.width = (a.width + (b.width - a.width) * t).toFixed(1) + 'px';
+        line.style.transform = 'translateX(' + (a.left + (b.left - a.left) * t).toFixed(1) + 'px)';
+        // Im Startbereich ausblenden, kurz vor dem ersten Abschnitt einblenden
+        const fade = Math.min(1, Math.max(0, (y - (tops[0] - innerHeight * 0.4)) / (innerHeight * 0.4)));
+        line.style.opacity = fade.toFixed(2);
+        const active = fade > 0.5 ? Math.round(pos) : -1;
+        links.forEach((l, k) => k === active ? l.setAttribute('aria-current', 'true') : l.removeAttribute('aria-current'));
+      }
+
+      let ticking = false;
+      addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { update(); ticking = false; });
+      }, { passive: true });
+      addEventListener('resize', measure);
+      addEventListener('load', measure);
+      if (document.fonts) document.fonts.ready.then(measure);
+      // Die Galerie wächst beim Nachladen, deshalb Abstände regelmäßig neu messen
+      new ResizeObserver(measure).observe(document.body);
+      measure();
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
