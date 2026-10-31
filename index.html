@@ -741,6 +741,84 @@
       cursor: pointer;
     }
 
+    /* Fortschritt beim Hochladen, bleibt unten am Bildschirm sichtbar */
+    .upbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 11;
+      background: var(--paper-light);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -4px 16px rgba(60, 45, 30, 0.12);
+      padding: 0.875rem var(--gutter) calc(0.875rem + env(safe-area-inset-bottom));
+      transform: translateY(110%);
+      transition: transform 0.3s ease;
+    }
+    .upbar.show { transform: none; }
+    .upbar-inner { max-width: 40rem; margin: 0 auto; }
+    .upbar-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    .upbar-text { font-weight: 600; margin: 0; }
+    .upbar-sub { margin: 0; color: var(--ink-soft); font-size: 0.9375rem; line-height: 1.4; }
+    .upbar-track {
+      height: 6px;
+      margin: 0.5rem 0 0.375rem;
+      background: var(--paper-deep);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .upbar-fill {
+      height: 100%;
+      width: 0;
+      background: var(--olive-dark);
+      transition: width 0.3s ease;
+    }
+    .upbar-fill.wait { width: 30%; animation: slide 1.2s ease-in-out infinite; }
+    @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+    .upbar-retry {
+      flex: none;
+      background: var(--olive-dark);
+      color: var(--paper-light);
+      border: 0;
+      border-radius: 2px;
+      font: 500 0.9375rem var(--serif);
+      min-height: 40px;
+      padding: 0 1rem;
+      cursor: pointer;
+    }
+
+    .gallery li { position: relative; }
+    .gallery li.pending img { opacity: 0.45; }
+    .gallery li.uploading::after {
+      content: "";
+      position: absolute;
+      top: calc(50% - 0.875rem);
+      left: calc(50% - 0.875rem);
+      width: 1.75rem;
+      height: 1.75rem;
+      border: 2px solid var(--olive-dark);
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .gallery li.failed::after {
+      content: "Nicht hochgeladen";
+      position: absolute;
+      left: 0.375rem;
+      right: 0.375rem;
+      bottom: 0.375rem;
+      padding: 0.125rem;
+      background: var(--error);
+      color: #fff;
+      font-size: 0.8125rem;
+      text-align: center;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .upbar-fill.wait { animation: none; width: 100%; opacity: 0.35; }
+      .gallery li.uploading::after { animation-duration: 2.4s; }
+    }
+
     @media (max-width: 59.99rem) {
       .hero-text {
         align-self: stretch;
@@ -1127,6 +1205,17 @@
         <button type="button" id="lightbox-close">Schließen</button>
       </div>
     </dialog>
+
+    <div class="upbar" id="upbar" role="status" aria-live="polite">
+      <div class="upbar-inner">
+        <div class="upbar-row">
+          <p class="upbar-text" id="upbar-text"></p>
+          <button type="button" class="upbar-retry" id="upbar-retry" hidden>Nochmal versuchen</button>
+        </div>
+        <div class="upbar-track"><div class="upbar-fill" id="upbar-fill"></div></div>
+        <p class="upbar-sub" id="upbar-sub"></p>
+      </div>
+    </div>
   </main>
 
   <footer>
@@ -1339,6 +1428,7 @@
       const SUPABASE_KEY = 'sb_publishable_DL38CqPQVMF3AkJEwgeKCw_l6QbXyL7';
       const BUCKET = 'gaestefotos';
       const PAGE = 48;
+      const PARALLEL = 3;
 
       const gallery = document.getElementById('gallery');
       const empty = document.getElementById('gallery-empty');
@@ -1348,7 +1438,13 @@
       const nameInput = document.getElementById('foto-name');
       const status = document.getElementById('upload-status');
       const lightbox = document.getElementById('lightbox');
+      const bar = document.getElementById('upbar');
+      const barText = document.getElementById('upbar-text');
+      const barSub = document.getElementById('upbar-sub');
+      const barFill = document.getElementById('upbar-fill');
+      const retryBtn = document.getElementById('upbar-retry');
       const shown = new Set();
+      const pendingByPath = new Map();
       let oldest = null;
 
       function setStatus(text, isError) {
@@ -1369,38 +1465,65 @@
 
       try { nameInput.value = localStorage.getItem('foto-name') || ''; } catch (e) {}
 
-      function render(foto, atTop) {
-        if (shown.has(foto.id)) return;
-        shown.add(foto.id);
+      // ---------- Galerie ----------
+
+      function makeTile(name) {
         const li = document.createElement('li');
         const btn = document.createElement('button');
         btn.type = 'button';
         const img = document.createElement('img');
-        img.src = publicUrl(smallPath(foto.pfad));
-        img.loading = 'lazy';
-        img.alt = foto.name ? 'Foto von ' + foto.name : 'Gästefoto';
+        img.alt = name ? 'Foto von ' + name : 'Gästefoto';
         btn.appendChild(img);
-        if (foto.name) {
+        if (name) {
           const by = document.createElement('span');
           by.className = 'by';
-          by.textContent = foto.name;
+          by.textContent = name;
           btn.appendChild(by);
         }
-        btn.addEventListener('click', () => {
+        li.appendChild(btn);
+        return { li, btn, img };
+      }
+
+      function bindOpen(tile, foto) {
+        tile.btn.disabled = false;
+        tile.btn.onclick = () => {
           const big = lightbox.querySelector('img');
           big.src = publicUrl(foto.pfad);
-          big.alt = img.alt;
+          big.alt = tile.img.alt;
           document.getElementById('lightbox-by').textContent = foto.name ? 'Von ' + foto.name : '';
           lightbox.showModal();
-        });
-        li.appendChild(btn);
+        };
+      }
+
+      function place(li, atTop) {
         if (atTop) {
-          li.className = 'neu';
+          li.classList.add('neu');
           gallery.prepend(li);
         } else {
           gallery.appendChild(li);
         }
         empty.hidden = true;
+      }
+
+      function render(foto, atTop) {
+        if (shown.has(foto.id)) return;
+        shown.add(foto.id);
+        // Eigenes Foto, das schon als Vorschau angezeigt wird
+        const own = pendingByPath.get(foto.pfad);
+        if (own) {
+          pendingByPath.delete(foto.pfad);
+          own.li.classList.remove('pending', 'uploading');
+          const preview = own.img.src;
+          own.img.onload = () => URL.revokeObjectURL(preview);
+          own.img.src = publicUrl(smallPath(foto.pfad));
+          bindOpen(own, foto);
+          return;
+        }
+        const tile = makeTile(foto.name);
+        tile.img.loading = 'lazy';
+        tile.img.src = publicUrl(smallPath(foto.pfad));
+        bindOpen(tile, foto);
+        place(tile.li, atTop);
       }
 
       async function load() {
@@ -1426,61 +1549,230 @@
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fotos' }, p => render(p.new, true))
         .subscribe();
 
-      // Verkleinert ein Bild auf höchstens max Pixel Kantenlänge und gibt ein JPEG zurück
-      async function shrink(file, max, quality) {
+      // ---------- Fortschrittsleiste ----------
+
+      let hideTimer = null;
+      let prepTimer = null;
+      let preparing = false;
+
+      function showBar(text, sub, pct) {
+        clearTimeout(hideTimer);
+        barText.textContent = text;
+        barSub.textContent = sub || '';
+        barFill.classList.toggle('wait', pct === null);
+        barFill.style.width = pct === null ? '' : Math.round(pct * 100) + '%';
+        bar.classList.add('show');
+      }
+
+      function hideBar(delay) {
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => bar.classList.remove('show'), delay || 0);
+      }
+
+      // iOS braucht nach „Hinzufügen“ einige Sekunden, bevor die Seite die Fotos bekommt
+      function startPreparing() {
+        if (busy()) return;
+        preparing = true;
+        retryBtn.hidden = true;
+        showBar('Fotos werden vorbereitet …', 'Das kann bei vielen Fotos einen Moment dauern.', null);
+        clearTimeout(prepTimer);
+        prepTimer = setTimeout(stopPreparing, 90000);
+      }
+
+      function stopPreparing() {
+        clearTimeout(prepTimer);
+        if (preparing && !busy()) hideBar();
+        preparing = false;
+      }
+
+      input.addEventListener('click', startPreparing);
+      input.addEventListener('cancel', stopPreparing);
+
+      // ---------- Hochladen ----------
+
+      const queue = [];
+      let failed = [];
+      let active = 0;
+      let total = 0;
+      let done = 0;
+      let steps = 0;
+      let wakeLock = null;
+
+      const busy = () => active > 0 || queue.length > 0;
+
+      function progress() {
+        const text = done + ' von ' + total + (total === 1 ? ' Foto' : ' Fotos') + ' hochgeladen';
+        showBar(text, 'Bitte lass diese Seite geöffnet, bis alle Fotos oben sind.', steps / (total * 3));
+      }
+
+      function step() {
+        steps++;
+        progress();
+      }
+
+      // Bilder nacheinander verkleinern, damit das Handy nicht zu viel Speicher braucht
+      let shrinkLock = Promise.resolve();
+      function exclusive(fn) {
+        const result = shrinkLock.then(fn);
+        shrinkLock = result.catch(() => {});
+        return result;
+      }
+
+      function toJpeg(canvas, quality) {
+        return new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob')), 'image/jpeg', quality));
+      }
+
+      // Erzeugt eine große (max. 2000 px) und eine kleine (max. 600 px) JPEG-Version
+      async function shrink(file) {
         const url = URL.createObjectURL(file);
         try {
           const img = new Image();
           img.src = url;
           await img.decode();
-          const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.round(img.naturalWidth * scale);
-          canvas.height = Math.round(img.naturalHeight * scale);
-          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-          return await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob')), 'image/jpeg', quality));
+          const fit = (max) => Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+          const big = document.createElement('canvas');
+          big.width = Math.round(img.naturalWidth * fit(2000));
+          big.height = Math.round(img.naturalHeight * fit(2000));
+          big.getContext('2d').drawImage(img, 0, 0, big.width, big.height);
+          const small = document.createElement('canvas');
+          small.width = Math.round(img.naturalWidth * fit(600));
+          small.height = Math.round(img.naturalHeight * fit(600));
+          small.getContext('2d').drawImage(big, 0, 0, small.width, small.height);
+          const blobs = { big: await toJpeg(big, 0.85), small: await toJpeg(small, 0.8) };
+          big.width = big.height = small.width = small.height = 0;
+          return blobs;
         } finally {
           URL.revokeObjectURL(url);
         }
       }
 
-      async function upload(file, name) {
+      async function upload(job) {
         const path = crypto.randomUUID() + '.jpg';
-        const [big, small] = await Promise.all([shrink(file, 2000, 0.85), shrink(file, 600, 0.8)]);
+        const blobs = await exclusive(() => shrink(job.file));
+        job.steps++; step();
         const opts = { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false };
-        const a = await db.storage.from(BUCKET).upload(path, big, opts);
+        const a = await db.storage.from(BUCKET).upload(path, blobs.big, opts);
         if (a.error) throw a.error;
-        const b = await db.storage.from(BUCKET).upload(smallPath(path), small, opts);
+        job.steps++; step();
+        const b = await db.storage.from(BUCKET).upload(smallPath(path), blobs.small, opts);
         if (b.error) throw b.error;
-        const { data, error } = await db.from('fotos').insert({ pfad: path, name: name || null }).select().single();
-        if (error) throw error;
+        pendingByPath.set(path, job.tile);
+        const { data, error } = await db.from('fotos').insert({ pfad: path, name: job.name || null }).select().single();
+        if (error) {
+          pendingByPath.delete(path);
+          throw error;
+        }
+        job.steps++; step();
         render(data, true);
       }
 
-      input.addEventListener('change', async () => {
+      async function run(job) {
+        job.steps = 0;
+        job.tile.li.classList.remove('failed');
+        job.tile.li.classList.add('uploading');
+        try {
+          await upload(job);
+          done++;
+        } catch (e) {
+          failed.push(job);
+          job.tile.li.classList.add('failed');
+          steps += 3 - job.steps;
+        }
+        job.tile.li.classList.remove('uploading');
+        progress();
+      }
+
+      function pump() {
+        while (active < PARALLEL && queue.length) {
+          const job = queue.shift();
+          active++;
+          run(job).finally(() => {
+            active--;
+            pump();
+            if (!busy()) finished();
+          });
+        }
+      }
+
+      function enqueue(jobs) {
+        stopPreparing();
+        retryBtn.hidden = true;
+        jobs.forEach(job => { queue.push(job); total++; });
+        progress();
+        keepAwake();
+        pump();
+      }
+
+      function finished() {
+        releaseAwake();
+        if (failed.length) {
+          const n = failed.length;
+          showBar(done + ' von ' + total + (total === 1 ? ' Foto ist' : ' Fotos sind') + ' online',
+            (n === 1 ? 'Ein Foto konnte' : n + ' Fotos konnten') + ' nicht hochgeladen werden. Prüf deine Internetverbindung.', 1);
+          retryBtn.hidden = false;
+          setStatus((n === 1 ? 'Ein Foto konnte' : n + ' Fotos konnten') + ' nicht hochgeladen werden.', true);
+        } else {
+          const text = done === 1 ? 'Fertig! Dein Foto ist online.' : 'Fertig! ' + done + ' Fotos sind online.';
+          showBar(text, 'Danke fürs Teilen!', 1);
+          hideBar(6000);
+          setStatus(text + ' Danke!');
+        }
+        total = 0;
+        done = 0;
+        steps = 0;
+      }
+
+      retryBtn.addEventListener('click', () => {
+        const jobs = failed;
+        failed = [];
+        jobs.forEach(job => job.tile.li.classList.remove('failed'));
+        enqueue(jobs);
+      });
+
+      input.addEventListener('change', () => {
         const files = [...input.files];
         input.value = '';
-        if (!files.length) return;
+        if (!files.length) {
+          stopPreparing();
+          return;
+        }
         const name = nameInput.value.trim().slice(0, 60);
         try { localStorage.setItem('foto-name', name); } catch (e) {}
+        setStatus('');
+        // Ausgewählte Fotos sofort als Vorschau zeigen
+        const jobs = files.map(file => {
+          const tile = makeTile(name);
+          tile.btn.disabled = true;
+          tile.li.classList.add('pending');
+          tile.img.src = URL.createObjectURL(file);
+          place(tile.li, true);
+          return { file, name, tile, steps: 0 };
+        });
+        enqueue(jobs);
+      });
 
-        drop.classList.add('busy');
-        let ok = 0;
-        let failed = 0;
-        for (const [i, file] of files.entries()) {
-          setStatus(files.length > 1 ? 'Lade Foto ' + (i + 1) + ' von ' + files.length + ' hoch …' : 'Lade Foto hoch …');
-          try {
-            await upload(file, name);
-            ok++;
-          } catch (e) {
-            failed++;
+      // Bildschirm während des Hochladens nicht ausgehen lassen
+      async function keepAwake() {
+        try {
+          if ('wakeLock' in navigator && !wakeLock) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => { wakeLock = null; });
           }
-        }
-        drop.classList.remove('busy');
-        if (failed) {
-          setStatus((failed === 1 ? 'Ein Foto konnte' : failed + ' Fotos konnten') + ' nicht hochgeladen werden. Prüf deine Internetverbindung und versuch es noch einmal.', true);
-        } else {
-          setStatus(ok === 1 ? 'Dein Foto ist online. Danke!' : ok + ' Fotos sind online. Danke!');
+        } catch (e) {}
+      }
+
+      function releaseAwake() {
+        if (wakeLock) wakeLock.release().catch(() => {});
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && busy()) keepAwake();
+      });
+
+      addEventListener('beforeunload', e => {
+        if (busy()) {
+          e.preventDefault();
+          e.returnValue = '';
         }
       });
 
