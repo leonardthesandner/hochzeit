@@ -32,7 +32,12 @@
 
     *, *::before, *::after { box-sizing: border-box; }
 
-    html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--nav-h);
+      /* Graues Antipp-Rechteck von iOS und Android ausblenden, die Seite zeigt eigene Rückmeldungen */
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       margin: 0;
