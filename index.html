@@ -600,7 +600,8 @@
     }
     textarea { resize: vertical; min-height: 6rem; }
 
-    .mains { display: grid; gap: 0.625rem; }
+    .starters, .mains { display: grid; gap: 0.625rem; }
+    .guest .starters { margin-bottom: 1.25rem; }
     .guest .answer, .guest .details { margin-bottom: 1.25rem; }
     .details[hidden] { display: none; }
     .mains[hidden] { display: none; }
@@ -1115,12 +1116,21 @@
             <h2>Das Menü</h2>
             <svg class="orn" aria-hidden="true"><use href="#orn"/></svg>
           </div>
-          <p class="menu-lead">Vorspeise und Nachspeise sind für alle gleich. Beim Hauptgang habt ihr die Wahl – sagt uns bei der Zusage, was ihr möchtet.</p>
+          <p class="menu-lead">Bei Vorspeise und Hauptgang habt ihr die Wahl – sagt uns bei der Zusage, was ihr möchtet. Das Dessert bleibt eine Überraschung.</p>
 
           <div class="course">
             <p class="course-name">Vorspeise</p>
-            <h3>Burrata mit Ochsenherztomaten</h3>
-            <p>Basilikumöl, geröstetes Sauerteigbrot</p>
+            <ul class="choices">
+              <li>
+                <h3>Beef Tatar vom Weiderind</h3>
+                <p>Kapern. Junger Salat. Rote Zwiebel. Grissini</p>
+              </li>
+              <li class="or">oder</li>
+              <li>
+                <h3>Gratinierter Ziegenkäse</h3>
+                <p>Rote Beete. Salatspitzen. Grüner Apfel. Maracujasorbet</p>
+              </li>
+            </ul>
           </div>
 
           <svg class="heart" aria-hidden="true"><use href="#heart"/></svg>
@@ -1129,18 +1139,18 @@
             <p class="course-name">Hauptgang</p>
             <ul class="choices">
               <li>
-                <h3>Rosa gebratener Kalbsrücken</h3>
-                <p>Pfifferlinge, Kartoffelgratin, Rotweinjus</p>
+                <h3>Filet vom Iberico Schwein</h3>
+                <p>Kartoffelgratin. Tomatisiertes Gemüse. Rotweinjus</p>
               </li>
               <li class="or">oder</li>
               <li>
-                <h3>Zanderfilet auf der Haut</h3>
-                <p>Rieslingsauce, junges Gartengemüse, Petersilienkartoffeln</p>
+                <h3>Zanderfilet</h3>
+                <p>Salzkartoffeln. Weißwein-Velouté</p>
               </li>
               <li class="or">oder</li>
               <li>
-                <h3>Ricotta-Gnocchi</h3>
-                <p>Salbeibutter, Ofentomaten, Bergkäse (vegetarisch)</p>
+                <h3>Spinat-Feta-Strudel</h3>
+                <p>Tomatisiertes Gemüse. Pinienkerne. Olivenöl. Alter Balsamico</p>
               </li>
             </ul>
           </div>
@@ -1148,9 +1158,8 @@
           <svg class="heart" aria-hidden="true"><use href="#heart"/></svg>
 
           <div class="course">
-            <p class="course-name">Nachspeise</p>
-            <h3>Holunderblüten-Panna-cotta</h3>
-            <p>Waldbeeren, Mandelkrokant</p>
+            <p class="course-name">Dessert</p>
+            <h3>Überraschung</h3>
           </div>
         </div>
       </div>
@@ -1291,19 +1300,30 @@
         </div>
       </fieldset>
       <fieldset class="details" hidden disabled>
+        <fieldset class="starters">
+          <legend>Vorspeise</legend>
+          <label class="pill">
+            <input type="radio" value="Beef Tatar" required>
+            <span class="pill-text"><strong>Beef Tatar vom Weiderind</strong><small>Kapern, junger Salat, Grissini</small></span>
+          </label>
+          <label class="pill">
+            <input type="radio" value="Gratinierter Ziegenkäse">
+            <span class="pill-text"><strong>Gratinierter Ziegenkäse</strong><small>Rote Beete, grüner Apfel, Maracujasorbet</small></span>
+          </label>
+        </fieldset>
         <fieldset class="mains">
           <legend>Hauptgang</legend>
           <label class="pill">
-            <input type="radio" value="Kalbsrücken" required>
-            <span class="pill-text"><strong>Kalbsrücken</strong><small>Pfifferlinge, Kartoffelgratin</small></span>
+            <input type="radio" value="Iberico Schwein" required>
+            <span class="pill-text"><strong>Filet vom Iberico Schwein</strong><small>Kartoffelgratin, Rotweinjus</small></span>
           </label>
           <label class="pill">
-            <input type="radio" value="Zander">
-            <span class="pill-text"><strong>Zanderfilet</strong><small>Rieslingsauce, Gartengemüse</small></span>
+            <input type="radio" value="Zanderfilet">
+            <span class="pill-text"><strong>Zanderfilet</strong><small>Salzkartoffeln, Weißwein-Velouté</small></span>
           </label>
           <label class="pill">
-            <input type="radio" value="Gnocchi (vegetarisch)">
-            <span class="pill-text"><strong>Ricotta-Gnocchi</strong><small>vegetarisch, Salbeibutter</small></span>
+            <input type="radio" value="Spinat-Feta-Strudel">
+            <span class="pill-text"><strong>Spinat-Feta-Strudel</strong><small>Pinienkerne, alter Balsamico</small></span>
           </label>
         </fieldset>
         <div class="field">
@@ -1379,6 +1399,7 @@
         node.querySelector('.allergy-label').htmlFor = id + '-allergy';
         node.querySelector('.guest-allergy').id = id + '-allergy';
         node.querySelectorAll('.answer input').forEach(r => { r.name = id + '-teilnahme'; });
+        node.querySelectorAll('.starters input').forEach(r => { r.name = id + '-vorspeise'; });
         node.querySelectorAll('.mains input').forEach(r => { r.name = id + '-hauptgang'; });
         node.querySelector('.remove').addEventListener('click', () => {
           node.remove();
@@ -1456,10 +1477,12 @@
             continue;
           }
           yesCount++;
+          const starter = g.querySelector('.starters input:checked');
+          if (!starter) return showError(t('Bitte wähle deine Vorspeise.', 'Bitte wählt für ' + name + ' eine Vorspeise.'), g.querySelector('.starters input'));
           const pick = g.querySelector('.mains input:checked');
           if (!pick) return showError(t('Bitte wähle deinen Hauptgang.', 'Bitte wählt für ' + name + ' einen Hauptgang.'), g.querySelector('.mains input'));
           const allergy = g.querySelector('.guest-allergy').value.trim();
-          lines.push(name + ': Zusage – ' + pick.value + (allergy ? ' – Allergien: ' + allergy : ''));
+          lines.push(name + ': Zusage – Vorspeise: ' + starter.value + ' – Hauptgang: ' + pick.value + (allergy ? ' – Allergien: ' + allergy : ''));
           if (allergy) allergies.push(name + ': ' + allergy);
         }
 
