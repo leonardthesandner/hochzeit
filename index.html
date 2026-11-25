@@ -635,6 +635,8 @@
       outline-offset: -7px;
       background: var(--paper-light);
     }
+    .thanks .btn { margin-top: 0.75rem; }
+    .pdf-error { color: var(--error); margin: 0.75rem 0 0; }
     .thanks h3 { font-family: var(--script); font-weight: 400; font-size: 2.75rem; line-height: 1.1; }
 
     .hp { position: absolute; left: -9999px; }
@@ -990,6 +992,8 @@
         <div class="thanks" id="thanks" hidden tabindex="-1">
           <h3 id="thanks-title"></h3>
           <p id="thanks-text"></p>
+          <button type="button" class="btn" id="pdf-btn" hidden>Bestätigung als PDF speichern</button>
+          <p class="pdf-error" id="pdf-error" hidden>Das PDF konnte nicht erstellt werden. Prüf deine Internetverbindung und versuch es noch einmal.</p>
         </div>
       </div>
     </section>
@@ -1001,6 +1005,7 @@
     <p class="kicker">14. August 2027 auf Schloss Egg</p>
   </footer>
 
+  <script src="pdf.js?v=1"></script>
   <template id="guest-tpl">
     <div class="guest">
       <div class="guest-head">
@@ -1195,7 +1200,8 @@
           if (yes === null) {
             return showError(t('Bitte sag uns, ob du kommst.', 'Bitte wählt für ' + name + ' Zusagen oder Absagen.'), g.querySelector('.answer input'));
           }
-          people.push({ first: name.split(/\s+/)[0], yes });
+          const person = { name, first: name.split(/\s+/)[0], yes };
+          people.push(person);
           if (!yes) {
             noCount++;
             lines.push(name + ': Absage');
@@ -1207,6 +1213,10 @@
           const pick = g.querySelector('.mains input:checked');
           if (!pick) return showError(t('Bitte wähle deinen Hauptgang.', 'Bitte wählt für ' + name + ' einen Hauptgang.'), g.querySelector('.mains input'));
           const allergy = g.querySelector('.guest-allergy').value.trim();
+          // Für das PDF die vollen Gerichtnamen merken
+          person.starter = starter.closest('label').querySelector('strong').textContent;
+          person.main = pick.closest('label').querySelector('strong').textContent;
+          person.allergy = allergy;
           lines.push(name + ': Zusage – Vorspeise: ' + starter.value + ' – Hauptgang: ' + pick.value + (allergy ? ' – Allergien: ' + allergy : ''));
           if (allergy) allergies.push(name + ': ' + allergy);
         }
@@ -1246,6 +1256,8 @@
           document.getElementById('thanks-title').textContent = title;
           document.getElementById('thanks-text').textContent = text;
           form.hidden = true;
+          lastAnswer = { people, shuttle: yesCount ? shuttle.value : '', comingCount: yesCount, sentAt: new Date() };
+          pdfBtn.hidden = !yesCount;
           const thanks = document.getElementById('thanks');
           thanks.hidden = false;
           // Bestätigung in die Bildschirmmitte holen, auch am Handy
@@ -1257,6 +1269,25 @@
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Antwort senden';
+        }
+      });
+
+      // Nach einer Zusage: Bestätigung mit allen gewählten Gerichten als PDF
+      const pdfBtn = document.getElementById('pdf-btn');
+      const pdfError = document.getElementById('pdf-error');
+      let lastAnswer = null;
+      pdfBtn.addEventListener('click', async () => {
+        if (!lastAnswer || !window.makeConfirmationPdf) return;
+        pdfBtn.disabled = true;
+        pdfError.hidden = true;
+        pdfBtn.textContent = 'PDF wird erstellt …';
+        try {
+          await window.makeConfirmationPdf(lastAnswer);
+        } catch (err) {
+          pdfError.hidden = false;
+        } finally {
+          pdfBtn.disabled = false;
+          pdfBtn.textContent = 'Bestätigung als PDF speichern';
         }
       });
 
